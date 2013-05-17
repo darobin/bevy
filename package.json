@@ -13,6 +13,8 @@
     ,   "portfinder":       "0.2.1"
     ,   "express":          "3.2.4"
     ,   "touch":            "0.0.2"
+    ,   "deep-equal":       "0.0.0"
+    ,   "npm":              "1.2.21"
     }
 ,   "devDependencies": {
     }
