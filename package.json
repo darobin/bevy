@@ -1,0 +1,13 @@
+{
+    "name":         "bevy"
+,   "description":  "A simple server to manage multiple Node services"
+,   "version":      "0.0.1"
+,   "license":      "MIT"
+,   "bin": {
+        "bevy": "./bin/bevy.js"
+    }
+,   "dependencies": {
+        "http-proxy":       "0.10.2"
+    ,   "forever-monitor":  "1.2.2"
+    }
+}
