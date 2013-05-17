@@ -9,5 +9,8 @@
 ,   "dependencies": {
         "http-proxy":       "0.10.2"
     ,   "forever-monitor":  "1.2.2"
+    ,   "utile":            "0.2.0"
+    }
+,   "devDependencies": {
     }
 }
