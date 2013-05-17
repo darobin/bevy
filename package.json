@@ -10,6 +10,8 @@
         "http-proxy":       "0.10.2"
     ,   "forever-monitor":  "1.2.2"
     ,   "utile":            "0.2.0"
+    ,   "portfinder":       "0.2.1"
+    ,   "express":          "3.2.4"
     }
 ,   "devDependencies": {
     }
