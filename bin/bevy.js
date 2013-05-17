@@ -5,7 +5,7 @@ var forever = require("forever-monitor")
 ,   MAX_RESTARTS = 100
 ;
 
-var child = new forever.Monitor(pth.join(__dirname, "../lib/bevy-server.js"), {
+var child = new forever.Monitor(pth.join(__dirname, "../lib/server.js"), {
     max:    MAX_RESTARTS
 });
 child.on("exit", function () {
