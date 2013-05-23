@@ -116,6 +116,8 @@ app is both local and static, Bevy will not copy the files over but rather serve
 directory.
 * ```scripts```: This is the standard ```package.json``` scripts object. Bevy uses its ```start```
 field to know which application to start. Defaults to ```app.js```.
+* ```username```: The username to use when deploying against that server.
+* ```password```: The password to use when deploying against that server.
 
 The way Bevy obtains that information is as follows:
 
@@ -141,9 +143,11 @@ starts it.
 * ```stop```: Stops the app.
 * ```remove```: Removes the app. Note that this can be somewhat destructive, it will remove logs
 (as well as anything that your app may have stored under its running directory).
+* ```help```: Get help.
 
 The options, which must come after the action, are the following:
 
+<!-- bevy usage -->
 * ```--package```: The path to the ```package.json``` to load. Defaults to the current directory.
 * ```--bevy```: The path to the ```bevy.json``` to load. Defaults to the current directory.
 * ```--env```: The environment under which to run. Defaults to development.
@@ -156,6 +160,9 @@ The options, which must come after the action, are the following:
 * ```--branch```: Same as ```repository.branch``` in JSON.
 * ```--path```: Same as ```repository.path``` in JSON.
 * ```--start```: Same as ```scripts.start``` in JSON.
+* ```--username```: Same as ```username``` in JSON.
+* ```--password```: Same as ```password``` in JSON.
+<!-- /bevy usage -->
 
 
 XXX
