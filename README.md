@@ -52,12 +52,14 @@ applicable) are as follows:
 * ```-f path```, ```--config path```: The path to a configuration file to use, possibly relative.
 * ```domain```, ```-d```, ```--domain```: The domain to use for the deployment service. Bevy listens
 to all incoming requests on its given ports, but one of those domains has to be assigned to the
-service that it exposes to manage the apps it is running. Required.
+service that it exposes to manage the apps it is running. Defaults to localhost.
 * ```ports```, ```-p```, ```--port```: The port on which to listen for requests to proxy. Note that
 several can be specified (using an array in JSON, and repeated options on the command line). It will
 listen to all of the provided ports and proxy in the same way for all. Defaults to 80.
 * ```store```, ```-s```, ```--store```: The directory in which Bevy will store the apps that it
-manages. Note that this needs to be writable by Bevy. Required.
+manages. Note that this needs to be writable by Bevy. Defaults to a directory called ```bevy-store```
+in either your ```$TMPDIR``` or ```/var/tmp```. It is **strongly** recommended to set this to 
+another value as you typically want it properly persisted.
 * ```username```, ```-u```, ```--username```: Bevy supports very simple authentication for its
 service (I nevertheless definitely recommend that you run it behind a tunnel of some form). This
 provides the username.
