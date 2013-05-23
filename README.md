@@ -157,5 +157,7 @@ XXX
 - we need a way to convey the selected environment to the Bevy server, and then for the Bevy server
 to run the app under the right NODE_ENV.
 - document the REST API. Explain why it's not all that REST.
-
+- actually implement the stuff above :)
+- security considerations about installing apps, and how to configure the service so that it is
+only available via localhost and get to it through a tunnel
 
