@@ -23,7 +23,7 @@ var nopt = require("nopt")
     ,   h:      ["--help"]
     }
 ,   cli = nopt(knownOpts, shortHands, process.argv, 2)
-,   configPath = cli.config ? pth.join(process.cwd(), cli.config) : "/etc/bevy/config.json"
+,   configPath = cli.config ? pth.resolve(process.cwd(), cli.config) : "/etc/bevy/config.json"
 ,   config = {}
 ;
 delete cli.argv;
@@ -63,7 +63,7 @@ if (cli.help) usage();
 
 // load the config and override it with CLI parameters
 if (fs.existsSync(configPath)) config = JSON.parse(fs.readFileSync(configPath, "utf8"));
-else if (cli.config) die("Configuration file not found: " + cli.config + "(" + configPath + ")");
+else if (cli.config) die("Configuration file not found: " + cli.config + " (resolved to " + configPath + ")");
 config = utile.mixin(config, cli);
 
 // run bevy, run!
