@@ -4,14 +4,17 @@ var expect = require("expect.js")
 ,   pth = require("path")
 ,   fs = require("fs")
 ,   spawn = require("child_process").spawn
+,   exec = require("child_process").exec
 ,   portfinder = require("portfinder")
 ,   request = require("request")
 ,   utile = require("utile")
 ,   serverPath = pth.join(__dirname, "../bin/bevy-server.js")
+,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
 ,   storePath = pth.join(__dirname, "store")
 ,   version = require("../package.json").version
 ,   debug = false
 ,   server
+,   deployPort
 ,   api = "http://localhost:"
 ;
 
@@ -20,6 +23,7 @@ before(function (done) {
         portfinder.getPort(function (err, port) {
             if (err) throw err;
             api += port + "/";
+            deployPort = port;
             server = spawn(serverPath, ["-d", "localhost"
                                     ,   "-p", port
                                     ,   "-s", storePath
@@ -61,6 +65,7 @@ describe("Server basics", function () {
 
     it("has no apps", function (done) {
         request.get(api + "apps", function (err, res, body) {
+            expect(err).to.be(null);
             body = JSON.parse(body);
             var count = 0;
             for (var k in body) if (body.hasOwnProperty(k)) count++;
@@ -68,19 +73,39 @@ describe("Server basics", function () {
             done();
         });
     });
-
-    // check that
-    //  we get version from /
-    //  we get an empty set of apps
-
-    // XXX
-    //  deploy
-    //      - a git app
-    //      - a local static (and check that it doesn't copy)
-    //  start
-    //  stop
-    //  remove (all)
-
-    // check that after installing an app
-
 });
+
+describe("Static server", function () {
+    var oldDir = process.cwd();
+    before(function (done) {
+        var staticDir = pth.join(__dirname, "static");
+        process.chdir(staticDir);
+        exec(bevyPath + " deploy --deploy " + api + " --path " + staticDir, function (err, stdout, stderr) {
+            if (stdout) console.log("[STDOUT]", stdout);
+            if (stderr) console.log("[STDERR]", stderr);
+            done();
+        });
+    });
+    after(function () {
+        process.chdir(oldDir);
+    });
+    it("serves basic content", function (done) {
+        request.get("http://127.0.0.1:" + deployPort, function (err, res, body) {
+            expect(err).to.be(null);
+            expect(body).to.equal("<h1>ohai!</h1>\n");
+            done();
+        });
+    });
+});
+
+
+// XXX
+//  deploy
+//      - a git app
+//      - a local static (and check that it doesn't copy)
+//  stop
+//  start
+//  remove (all)
+
+// check that after installing an app the apps list changes
+

@@ -1,0 +1,8 @@
+{
+    "name":     "static"
+,   "domain":   "127.0.0.1"
+,   "static":   true
+,   "repository": {
+        "type": "local"
+    }
+}

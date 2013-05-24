@@ -46,7 +46,6 @@ if (command === "stage") {
 
 // go to help immediately if requested
 if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|stage|help [OPTIONS]", "bevy");
-console.log(process.argv, cli);
 
 // load the config and override it with CLI parameters
 var packConf = {}, bevyConf = {};
@@ -57,7 +56,7 @@ else if (cli.bevy) cliUtils.die("Could not find bevy.json: " + cli.bevy + " (res
 
 // merge in the order: package.json < bevy.json < bevy.json[env] < cli
 // we need to merge repository separately as it's deep
-var conf = utile.mixin({}, packConf, bevyConf, bevyConf[cli.env], cli);
+var conf = utile.mixin({}, packConf, bevyConf, bevyConf[cli.env] || {}, cli);
 conf.repository = utile.mixin(  packConf.repository || {}
                             ,   bevyConf.repository || {}
                             ,   bevyConf[cli.env] ? bevyConf[cli.env].repository || {} : {}
@@ -89,30 +88,35 @@ if (conf.username) {
 }
 
 function simpleRes (err, res, body) {
-    if (err) console.log(JSON.parse(body).error);
-    else console.log("OK");
+    if (err) return console.log(err);
+    body = (typeof body === "string") ? JSON.parse(body) : body;
+    if (body && body.error) return console.log(body.error);
+    console.log("OK");
 }
 
 if (command === "deploy") {
     // get to see if the app exists
     // if it does, send the update signal
     // otherwise, PUT it
+    console.log(conf.deploy + "app/" + conf.name);
     request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
-        if (err) {
-            // app does not exist at all, install it
-            if (res.statusCode === 404) {
-                reqConf.json = conf;
-                request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
-                    if (err) return console.log(body.error);
-                    request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
-                });
-            }
-            else {
-                console.log(JSON.parse(body).error); // real error
-            }
-            return;
+        if (err) return console.log(err);
+
+        // app does not exist at all, install it
+        if (res.statusCode === 404) {
+            reqConf.json = conf;
+            request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
+                if (err) return console.log(body.error);
+                delete reqConf.method; // I'm starting to hate this library
+                delete reqConf.json;
+                request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+            });
         }
-        request.get(conf.deploy + "app/" + conf.name + "/update", reqConf, simpleRes);
+        else {
+            body = (typeof body === "string") ? JSON.parse(body) : body;
+            if (body && body.error) return console.log(body.error);
+            request.get(conf.deploy + "app/" + conf.name + "/update", reqConf, simpleRes);
+        }
     });
 }
 else if (command === "start") {
