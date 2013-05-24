@@ -7,6 +7,7 @@ var expect = require("expect.js")
 ,   exec = require("child_process").exec
 ,   portfinder = require("portfinder")
 ,   request = require("request")
+,   prompt = require("prompt")
 ,   utile = require("utile")
 ,   serverPath = pth.join(__dirname, "../bin/bevy-server.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
@@ -15,10 +16,12 @@ var expect = require("expect.js")
 ,   debug = false
 ,   server
 ,   deployPort
+,   testDomain
 ,   api = "http://localhost:"
 ;
 
 before(function (done) {
+    this.timeout(0);
     utile.rimraf(storePath, function () {
         portfinder.getPort(function (err, port) {
             if (err) throw err;
@@ -38,7 +41,20 @@ before(function (done) {
             server.stdout.on("data", function () {
                 if (seen) return;
                 seen = true;
-                done();
+                if (process.env.BEVY_DOMAIN) {
+                    testDomain = process.env.BEVY_DOMAIN;
+                    done();
+                }
+                else {
+                    console.log("In order to test this, we need a domain pointing to this machine other than 'localhost'.");
+                    console.log("You can also set the BEVY_DOMAIN environment variable to avoid this prompt.");
+                    prompt.start();
+                    prompt.get(["domain"], function (err, res) {
+                        if (err) throw(err);
+                        testDomain = res.domain;
+                        done();
+                    });
+                }
             });
         });
     });
@@ -80,32 +96,37 @@ describe("Static server", function () {
     before(function (done) {
         var staticDir = pth.join(__dirname, "static");
         process.chdir(staticDir);
-        exec(bevyPath + " deploy --deploy " + api + " --path " + staticDir, function (err, stdout, stderr) {
-            if (stdout) console.log("[STDOUT]", stdout);
-            if (stderr) console.log("[STDERR]", stderr);
-            done();
+        exec(bevyPath + " deploy --deploy " + api + " --path " + staticDir + " --domain " + testDomain, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
+            setTimeout(done, 200); // wait a bit because it can take a little while to spawn
         });
     });
-    after(function () {
-        process.chdir(oldDir);
+    after(function (done) {
+        exec(bevyPath + " remove --deploy " + api, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
+            process.chdir(oldDir);
+            done();
+        });
     });
     it("serves basic content", function (done) {
-        request.get("http://127.0.0.1:" + deployPort, function (err, res, body) {
+        request.get("http://" + testDomain + ":" + deployPort, function (err, res, body) {
             expect(err).to.be(null);
-            expect(body).to.equal("<h1>ohai!</h1>\n");
+            expect(body).to.equal("<h1>ohai!</h1>");
             done();
         });
     });
+    // start & stop
+    // list changes
 });
 
 
 // XXX
 //  deploy
 //      - a git app
-//      - a local static (and check that it doesn't copy)
 //  stop
 //  start
-//  remove (all)
 
 // check that after installing an app the apps list changes
 

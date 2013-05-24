@@ -67,12 +67,6 @@ if (staging) conf.env = "production";
 // validate required
 conf.deploy || cliUtils.die("Missing 'deploy' information.");
 conf.name || cliUtils.die("Missing 'name' information.");
-if (conf.repository.type === "local") {
-    conf.repository.path || cliUtils.die("Missing 'path' information for local repository.");
-}
-else { // git is the default
-    conf.repository.url || cliUtils.die("Missing 'url' information for git repository.");
-}
 
 // defaulting
 if (conf.deploy.indexOf("://") === -1) conf.deploy = "http://" + conf.deploy;
@@ -95,10 +89,15 @@ function simpleRes (err, res, body) {
 }
 
 if (command === "deploy") {
+    if (conf.repository.type === "local") {
+        conf.repository.path || cliUtils.die("Missing 'path' information for local repository.");
+    }
+    else { // git is the default
+        conf.repository.url || cliUtils.die("Missing 'url' information for git repository.");
+    }
     // get to see if the app exists
     // if it does, send the update signal
     // otherwise, PUT it
-    console.log(conf.deploy + "app/" + conf.name);
     request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
         if (err) return console.log(err);
 
