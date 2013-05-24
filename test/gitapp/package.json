@@ -1,5 +1,5 @@
 {
-    "name":     "git-app"
+    "name":     "gitapp"
 ,   "version":  "42.20.17"
 ,   "private":  true
 ,   "dependencies": {

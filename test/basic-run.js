@@ -1,3 +1,4 @@
+/*jshint es5: true*/
 /*global before, after, describe*/
 
 var expect = require("expect.js")
@@ -117,15 +118,48 @@ describe("Static server", function () {
             done();
         });
     });
-    // start & stop
-    // list changes
+    it("shows up in list of apps", function (done) {
+        request.get(api + "apps", function (err, res, body) {
+            expect(err).to.be(null);
+            body = JSON.parse(body);
+            expect(body.static).to.be.ok();
+            expect(body.static.running).to.be.ok();
+            done();
+        });
+    });
+    it("stops", function (done) {
+        request.get(api + "app/static/stop", function (err) {
+            expect(err).to.be(null);
+            request.get(api + "apps", function (err, res, body) {
+                expect(err).to.be(null);
+                body = JSON.parse(body);
+                expect(body.static).to.be.ok();
+                expect(body.static.running).to.be(false);
+                done();
+            });
+        });
+    });
+    it("restarts", function (done) {
+        request.get(api + "app/static/start", function (err) {
+            expect(err).to.be(null);
+            request.get(api + "apps", function (err, res, body) {
+                expect(err).to.be(null);
+                body = JSON.parse(body);
+                expect(body.static).to.be.ok();
+                expect(body.static.running).to.ok();
+                done();
+            });
+        });
+    });
 });
 
 describe("Dynamic server", function () {
+    this.timeout(20000);
     var oldDir = process.cwd();
     before(function (done) {
-        var appDir = pth.join(__dirname, "git-app");
+        var appDir = pth.join(__dirname, "gitapp");
         process.chdir(appDir);
+        console.log("    This can take a little while...");
         exec(bevyPath + " deploy --deploy " + api + " --url " + appDir + " --domain " + testDomain, function (err, stdout, stderr) {
             if (stdout && debug) console.log("[STDOUT]", stdout);
             if (stderr && debug) console.log("[STDERR]", stderr);
@@ -147,16 +181,37 @@ describe("Dynamic server", function () {
             done();
         });
     });
-    // start & stop
-    // list changes
+    it("shows up in list of apps", function (done) {
+        request.get(api + "apps", function (err, res, body) {
+            expect(err).to.be(null);
+            body = JSON.parse(body);
+            expect(body.gitapp).to.be.ok();
+            expect(body.gitapp.running).to.be.ok();
+            done();
+        });
+    });
+    it("stops", function (done) {
+        request.get(api + "app/gitapp/stop", function (err) {
+            expect(err).to.be(null);
+            request.get(api + "apps", function (err, res, body) {
+                expect(err).to.be(null);
+                body = JSON.parse(body);
+                expect(body.gitapp).to.be.ok();
+                expect(body.gitapp.running).to.be(false);
+                done();
+            });
+        });
+    });
+    it("restarts", function (done) {
+        request.get(api + "app/gitapp/start", function (err) {
+            expect(err).to.be(null);
+            request.get(api + "apps", function (err, res, body) {
+                expect(err).to.be(null);
+                body = JSON.parse(body);
+                expect(body.gitapp).to.be.ok();
+                expect(body.gitapp.running).to.ok();
+                done();
+            });
+        });
+    });
 });
-
-
-// XXX
-//  deploy
-//      - a git app
-//  stop
-//  start
-
-// check that after installing an app the apps list changes
-
