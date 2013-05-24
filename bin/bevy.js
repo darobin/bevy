@@ -79,7 +79,7 @@ else { // git is the default
 if (conf.deploy.indexOf("://") === -1) conf.deploy = "http://" + conf.deploy;
 if (!/\/$/.test(conf.deploy)) conf.deploy += "/";
 
-var reqConf = { json: true };
+var reqConf = {};
 if (conf.username) {
     reqConf.auth = {
         user:               conf.username
@@ -89,7 +89,7 @@ if (conf.username) {
 }
 
 function simpleRes (err, res, body) {
-    if (err) console.log(body.error);
+    if (err) console.log(JSON.parse(body).error);
     else console.log("OK");
 }
 
@@ -108,7 +108,7 @@ if (command === "deploy") {
                 });
             }
             else {
-                console.log(body.error); // real error
+                console.log(JSON.parse(body).error); // real error
             }
             return;
         }
