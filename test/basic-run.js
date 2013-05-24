@@ -121,6 +121,36 @@ describe("Static server", function () {
     // list changes
 });
 
+describe("Dynamic server", function () {
+    var oldDir = process.cwd();
+    before(function (done) {
+        var appDir = pth.join(__dirname, "git-app");
+        process.chdir(appDir);
+        exec(bevyPath + " deploy --deploy " + api + " --url " + appDir + " --domain " + testDomain, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
+            setTimeout(done, 200); // wait a bit because it can take a little while to spawn
+        });
+    });
+    after(function (done) {
+        exec(bevyPath + " remove --deploy " + api, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
+            process.chdir(oldDir);
+            done();
+        });
+    });
+    it("serves basic content", function (done) {
+        request.get("http://" + testDomain + ":" + deployPort, function (err, res, body) {
+            expect(err).to.be(null);
+            expect(body).to.equal("<h1>dynamic ohai!</h1>");
+            done();
+        });
+    });
+    // start & stop
+    // list changes
+});
+
 
 // XXX
 //  deploy

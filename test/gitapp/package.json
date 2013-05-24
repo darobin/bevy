@@ -1,0 +1,11 @@
+{
+    "name":     "git-app"
+,   "version":  "42.20.17"
+,   "private":  true
+,   "dependencies": {
+        "express":  "*"
+    }
+,   "scripts": {
+        "start": "app.js"
+    }
+}
