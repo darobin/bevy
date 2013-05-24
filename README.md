@@ -168,6 +168,14 @@ The options, which must come after the action, are the following:
 <!-- /bevy usage -->
 
 
+Deploying Bevy Securely
+-----------------------
+
+XXX
+- security considerations about installing apps, and how to configure the service so that it is
+only available via localhost and get to it through a tunnel
+
+
 REST API
 --------
 
@@ -306,9 +314,3 @@ If it fails, it returns a 500 with one of:
 
     { error: "Failed to stop app, cannot remove: REASON" }
     { error: "Failed to remove app: REASON" }
-
-
-XXX
-- security considerations about installing apps, and how to configure the service so that it is
-only available via localhost and get to it through a tunnel
-- tests
