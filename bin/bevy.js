@@ -27,6 +27,7 @@ var nopt = require("nopt")
 ,   cli = nopt(knownOpts, {}, process.argv, 2)
 ,   packPath = pth.resolve(process.cwd(), cli.package || "package.json")
 ,   bevyPath = pth.resolve(process.cwd(), cli.bevy || "bevy.json")
+,   staging = false
 ;
 delete cli.argv;
 cli.repository = {};
@@ -37,10 +38,14 @@ cli.repository = {};
     }
 });
 if (!cli.env) cli.env = "development";
+if (command === "stage") {
+    command = "deploy";
+    staging = true;
+}
 
 
 // go to help immediately if requested
-if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|help [OPTIONS]", "bevy");
+if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|stage|help [OPTIONS]", "bevy");
 console.log(process.argv, cli);
 
 // load the config and override it with CLI parameters
@@ -58,6 +63,7 @@ conf.repository = utile.mixin(  packConf.repository || {}
                             ,   bevyConf[cli.env] ? bevyConf[cli.env].repository || {} : {}
                             ,   cli.repository
                             );
+if (staging) conf.env = "production";
 
 // validate required
 conf.deploy || cliUtils.die("Missing 'deploy' information.");

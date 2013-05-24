@@ -143,6 +143,9 @@ starts it.
 * ```stop```: Stops the app.
 * ```remove```: Removes the app. Note that this can be somewhat destructive, it will remove logs
 (as well as anything that your app may have stored under its running directory).
+* ```stage```: Deploys the app using the configuration for the "development" environment but setting
+the runtime environment to "production". This allows you to run code on your development deployment
+under production conditions.
 * ```help```: Get help.
 
 The options, which must come after the action, are the following:
@@ -165,8 +168,147 @@ The options, which must come after the action, are the following:
 <!-- /bevy usage -->
 
 
+REST API
+--------
+
+The REST API exposed to manage applications would be better described as an HTTP API because it's
+not in fact all that RESTful. Where it made sense, I elected to go with simplicity of interaction
+(e.g. just entering a URL in the browser bar) over "correctness". I don't believe that anything is
+lost here, except perhaps RESTafarian brownie points. I can live without those.
+
+All interactions involve JSON.
+
+### GET /
+Provides the server information. Mostly useful to check that it's running.
+Always returns the version:
+
+    { bevy: "0.2.42" }
+
+### GET /apps
+Lists all the apps, keyed by name. The value for each is an object describing the application that
+corresponds to the app's configuration as provided during deployment (typically, as resolved
+by ```bevy```). Additionally, it contains a ```running``` boolean indicating whether the app is
+running or not, a number of paths that are used in running the app, and the port that it uses. Apart
+from ```running```, you shouldn't need any of that information but it can come in handy for
+debugging purposes.
+
+Example response:
+
+    {
+      "first-test": {
+        "name": "first-test",
+        "version": "0.0.1",
+        "domain": "first-test.local",
+        "dependencies": {
+          "express": "*",
+          "eyes": "*"
+        },
+        "repository": {
+          "type": "git",
+          "url": "/Projects/bevy/scratch/one"
+        },
+        "scripts": {
+          "start": "app.js"
+        },
+        "environment": "dev",
+        "running": true,
+        "storePath": "/var/folders/p4/1wzy444j5tbg__5kj1nt8lxr0000gn/T/bevy-store/first-test",
+        "configPath": "/var/folders/p4/1wzy444j5tbg__5kj1nt8lxr0000gn/T/bevy-store/first-test/config.json",
+        "runningPath": "/var/folders/p4/1wzy444j5tbg__5kj1nt8lxr0000gn/T/bevy-store/first-test/RUNNING",
+        "contentPath": "/var/folders/p4/1wzy444j5tbg__5kj1nt8lxr0000gn/T/bevy-store/first-test/content",
+        "startPath": "/var/folders/p4/1wzy444j5tbg__5kj1nt8lxr0000gn/T/bevy-store/first-test/content/app.js",
+        "port": 7001
+      }
+    }
+
+### GET /app/:name
+Returns the same information as the previous operation, but just for one app with the given name.
+
+If the app is not found, it returns a 404 with:
+
+    { error: "No app for this name." }
+
+If successful, it will return the same JSON as above, below the corresponding app name key.
+
+### GET /app/:name/start
+Starts the app.
+
+If the app is not found, it returns a 404 with:
+
+    { error: "No app for this name." }
+
+If the app was already running, it returns a 418 with:
+
+    { error: "App already running." }
+
+For all other errors, it returns a 500 with the ```error``` field set to whatever error the
+system provided.
+
+### GET /app/:name/stop
+Stops the app
+
+If the app is not found, it returns a 404 with:
+
+    { error: "No app for this name." }
+
+If the app was already running, it returns a 418 with:
+
+    { error: "App already stopped." }
+
+For all other errors, it returns a 500 with the ```error``` field set to whatever error the
+system provided.
+
+### GET /app/:name/update
+Causes the source of the app to update from the repo (pull it through git, or copying files), and
+the app to then be restarted. This can be quite long, especially if npm installs a number of new
+dependencies.
+
+If the app is not found, it returns a 404 with:
+
+    { error: "No app for this name." }
+
+For all other errors, it returns a 500 with the ```error``` field set to whatever error the
+system provided.
+
+### PUT /app/:name
+Create or update the configuration of an app. The body of the request must be the desired
+configuration (as described in the previous section).
+
+If the app was already running, then it is restarted. However, if it was not, or if this is a fresh
+install, then the application is **not** started. (The command line tool does that for you on 
+install, though.)
+
+If the name does not match ```/^[a-zA-Z0-9-_]+$/```, it returns a 400 with:
+
+    { error: "Bad name, rule: /^[a-zA-Z0-9-_]+$/." }
+
+If no configuration is provided, it returns a 400 with:
+
+    { error: "No JSON configuration provided." }
+
+If the ```repository``` or ```domain``` fields are missing, it returns a 400 with:
+
+    { error: "Field 'XXX' required." }
+
+For all other errors, it returns a 500 with the ```error``` field set to whatever error the
+system provided.
+
+Note that this can take a while to respond as npm installs dependencies.
+
+### DELETE /app/:name
+Stops and deletes the app.
+
+If the app is not found, it returns a 404 with:
+
+    { error: "No app for this name." }
+
+If it fails, it returns a 500 with one of:
+
+    { error: "Failed to stop app, cannot remove: REASON" }
+    { error: "Failed to remove app: REASON" }
+
+
 XXX
-- document the REST API. Explain why it's not all that REST.
 - security considerations about installing apps, and how to configure the service so that it is
 only available via localhost and get to it through a tunnel
 - tests
