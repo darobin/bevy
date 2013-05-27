@@ -1,6 +1,8 @@
 Bevy - A simple server to manage multiple Node services
 =======================================================
 
+[![NPM version](https://badge.fury.io/js/bevy.png)](http://badge.fury.io/js/bevy)
+
 I love Node, but I have often found deployment to be more painful than it could be. One typically
 has to somehow upload the new code, stop the old, restart it, make sure there's a properly
 configured proxy in front of it in order to serve off port 80 for a given domain, etc. It's all
