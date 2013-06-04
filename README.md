@@ -64,6 +64,11 @@ listen to all of the provided ports and proxy in the same way for all. Defaults 
 manages. Note that this needs to be writable by Bevy. Defaults to a directory called ```bevy-store```
 in either your ```$TMPDIR``` or ```/var/tmp```. It is **strongly** recommended to set this to 
 another value as you typically want it properly persisted.
+* ```security```, ```--security```: The default security setup for Bevy is to only accept 
+connections to its management API coming from ```127.0.0.1``` or ```::1```, corresponding to the
+value ```local```. This can be set to ```none``` to disable this check. **BE VERY CAREFUL** as this
+effectively enables anyone who can reach the server to install and run arbitrary software on the
+machine.
 <!-- /bevy-server usage -->
 
 An example configuration file:
@@ -162,10 +167,39 @@ The options, which must come after the action, are the following:
 Deploying Bevy Securely
 -----------------------
 
-XXX
-- security considerations about installing apps, and how to configure the service so that it is
-only available via localhost and get to it through a tunnel
+Bevy is a system that allows you to install and run software that can perform arbitrary operations,
+over the network. Read that again. Make sure you get this. This section isn't something you want to
+read in the future, as a nice-to-have, feel-good extra. You **have** to read it.
 
+By default, Bevy's app management API only accepts connections coming from ```127.0.0.1``` or
+```::1```. On the face of it, this makes the API a whole lot less useful if you're on your 
+development machine and want to deploy to production. One simple way of doing that is explained
+further below.
+
+Note that there is an option to disable this security check entirely. It is there so that people who
+know what they are doing can do so. For instance, you could consider using it on a machine that is
+well protected inside your own network. But only do so **very** carefully. Note that binding the
+API to ```localhost``` is not enough to protect you; if I know the IP I can still reach it and
+specify ```Host: localhost``` to fool the server.
+
+The simplest way to set Bevy up on a production, world-accessible server is to:
+
+1. Stick to ```localhost``` (or whatever local domain) for the server.
+2. Keep the above security check on (it is by default).
+3. Use an SSH tunnel from your development box to the server. That's pretty easy.
+
+The way in which you set up an SSH tunnel is as follows (assuming you already have SSH access to
+the server). Run:
+
+    ssh -f your-user@your-server.com -L 2000:your-server.com:80 -N
+
+What the above does is that it creates a tunnel from ```localhost:2000``` to 
+```your-server.com:80``` through an SSH connection that identifies you as ```your-user``` to the
+server. You can naturally change your user, the remote server, and the ports you use. You can save
+that command, run it at start up, etc.
+
+With the above setup, your deployment target simply becomes ```http://localhost:2000/```. When Bevy
+talks to that URL, it will be talking to the remote server.
 
 REST API
 --------

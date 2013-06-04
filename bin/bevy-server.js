@@ -11,6 +11,7 @@ var nopt = require("nopt")
     ,   domain:     String
     ,   ports:      [Array, Number]
     ,   store:      String
+    ,   security:   String
     ,   help:       Boolean
     }
 ,   shortHands = {
