@@ -76,8 +76,7 @@ An example configuration file:
 
 The same on the command line:
 
-    forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/ \
-            -u robin --password fakefake
+    forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/
 
 You can mix and match the configuration file and command line parameters; the latter will take
 priority.
