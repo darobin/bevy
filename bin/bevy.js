@@ -105,9 +105,14 @@ if (command === "deploy") {
         reqConf.json = conf;
         request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
             if (err) return console.log(body.error);
-            delete reqConf.method; // I'm starting to hate this library
-            delete reqConf.json;
-            if (notExists) request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+            if (notExists) {
+              delete reqConf.method; // I'm starting to hate this library
+              delete reqConf.json;
+              request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+            }
+            else {
+              console.log("OK");
+            }
         });
     });
 }
