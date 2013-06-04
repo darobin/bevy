@@ -20,8 +20,6 @@ var nopt = require("nopt")
     ,   branch:     String
     ,   path:       String
     ,   start:      String
-    ,   username:   String
-    ,   password:   String
     }
 ,   command = process.argv.splice(2, 1)[0]
 ,   cli = nopt(knownOpts, {}, process.argv, 2)
@@ -73,14 +71,6 @@ if (conf.deploy.indexOf("://") === -1) conf.deploy = "http://" + conf.deploy;
 if (!/\/$/.test(conf.deploy)) conf.deploy += "/";
 
 var reqConf = {};
-if (conf.username) {
-    reqConf.auth = {
-        user:               conf.username
-    ,   pass:               conf.password
-    ,   sendImmediately:    true
-    };
-}
-
 function simpleRes (err, res, body) {
     if (err) return console.log(err);
     body = (typeof body === "string") ? JSON.parse(body) : body;

@@ -64,10 +64,6 @@ listen to all of the provided ports and proxy in the same way for all. Defaults 
 manages. Note that this needs to be writable by Bevy. Defaults to a directory called ```bevy-store```
 in either your ```$TMPDIR``` or ```/var/tmp```. It is **strongly** recommended to set this to 
 another value as you typically want it properly persisted.
-* ```username```, ```-u```, ```--username```: Bevy supports very simple authentication for its
-service (I nevertheless definitely recommend that you run it behind a tunnel of some form). This
-provides the username.
-* ```password```, ```--password```: The password to match the username above.
 <!-- /bevy-server usage -->
 
 An example configuration file:
@@ -76,8 +72,6 @@ An example configuration file:
         "domain":   "deploy.example.net"
     ,   "ports":    [80, 443]
     ,   "store":    "/users/bevy/store/"
-    ,   "username": "robin"
-    ,   "password": "fakefake"
     }
 
 The same on the command line:
@@ -118,8 +112,6 @@ app is both local and static, Bevy will not copy the files over but rather serve
 directory.
 * ```scripts```: This is the standard ```package.json``` scripts object. Bevy uses its ```start```
 field to know which application to start. Defaults to ```app.js```.
-* ```username```: The username to use when deploying against that server.
-* ```password```: The password to use when deploying against that server.
 
 The way Bevy obtains that information is as follows:
 
@@ -165,8 +157,6 @@ The options, which must come after the action, are the following:
 * ```--branch```: Same as ```repository.branch``` in JSON.
 * ```--path```: Same as ```repository.path``` in JSON.
 * ```--start```: Same as ```scripts.start``` in JSON.
-* ```--username```: Same as ```username``` in JSON.
-* ```--password```: Same as ```password``` in JSON.
 <!-- /bevy usage -->
 
 
