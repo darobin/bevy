@@ -98,24 +98,17 @@ if (command === "deploy") {
     // get to see if the app exists
     // if it does, send the update signal
     // otherwise, PUT it
-    request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
+    request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res) {
         if (err) return console.log(err);
 
-        // app does not exist at all, install it
-        if (res.statusCode === 404) {
-            reqConf.json = conf;
-            request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
-                if (err) return console.log(body.error);
-                delete reqConf.method; // I'm starting to hate this library
-                delete reqConf.json;
-                request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
-            });
-        }
-        else {
-            body = (typeof body === "string") ? JSON.parse(body) : body;
-            if (body && body.error) return console.log(body.error);
-            request.get(conf.deploy + "app/" + conf.name + "/update", reqConf, simpleRes);
-        }
+        var notExists = res.statusCode === 404;
+        reqConf.json = conf;
+        request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
+            if (err) return console.log(body.error);
+            delete reqConf.method; // I'm starting to hate this library
+            delete reqConf.json;
+            if (notExists) request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+        });
     });
 }
 else if (command === "start") {
