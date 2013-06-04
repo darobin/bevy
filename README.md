@@ -65,7 +65,7 @@ manages. Note that this needs to be writable by Bevy. Defaults to a directory ca
 in either your ```$TMPDIR``` or ```/var/tmp```. It is **strongly** recommended to set this to 
 another value as you typically want it properly persisted.
 * ```security```, ```--security```: The default security setup for Bevy is to only accept 
-connections to its management API coming from ```127.0.0.1``` or ```::1```, corresponding to the
+connections to its management API coming from the local machine, corresponding to the
 value ```local```. This can be set to ```none``` to disable this check. **BE VERY CAREFUL** as this
 effectively enables anyone who can reach the server to install and run arbitrary software on the
 machine.
@@ -171,8 +171,8 @@ Bevy is a system that allows you to install and run software that can perform ar
 over the network. Read that again. Make sure you get this. This section isn't something you want to
 read in the future, as a nice-to-have, feel-good extra. You **have** to read it.
 
-By default, Bevy's app management API only accepts connections coming from ```127.0.0.1``` or
-```::1```. On the face of it, this makes the API a whole lot less useful if you're on your 
+By default, Bevy's app management API only accepts connections coming from an IP on the local 
+machine. On the face of it, this makes the API a whole lot less useful if you're on your 
 development machine and want to deploy to production. One simple way of doing that is explained
 further below.
 
