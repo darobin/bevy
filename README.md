@@ -116,6 +116,8 @@ app is both local and static, Bevy will not copy the files over but rather serve
 directory.
 * ```scripts```: This is the standard ```package.json``` scripts object. Bevy uses its ```start```
 field to know which application to start. Defaults to ```app.js```.
+* ```directoryIndex```: Applies only to static servers, this provides a list of file names to use
+to select the directory index. It defaults to ```index.html```.
 
 The way Bevy obtains that information is as follows:
 

@@ -16,7 +16,7 @@
     ,   "touch":            "0.0.2"
     ,   "deep-equal":       "0.0.0"
     ,   "npm":              "1.2.21"
-    ,   "send":             "0.1.0"
+    ,   "send":             "git://github.com/darobin/send#multiple-index"
     ,   "nopt":             "2.1.1"
     ,   "request":          "2.21.0"
     }
