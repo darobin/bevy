@@ -23,7 +23,7 @@ var expect = require("expect.js")
 
 before(function (done) {
     this.timeout(0);
-    utile.rimraf(storePath, function () {
+    utile.rimraf(storePath, function (err) {
         portfinder.getPort(function (err, port) {
             if (err) throw err;
             api += port + "/";
@@ -71,7 +71,7 @@ describe("Server basics", function () {
     it("creates a store", function () {
         expect(fs.existsSync(storePath)).to.be.ok();
     });
-
+    
     it("starts a basic server", function (done) {
         request.get(api,function (err, res, body) {
             body = JSON.parse(body);
@@ -79,7 +79,7 @@ describe("Server basics", function () {
             done();
         });
     });
-
+    
     it("has no apps", function (done) {
         request.get(api + "apps", function (err, res, body) {
             expect(err).to.be(null);
