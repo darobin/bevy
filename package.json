@@ -19,6 +19,7 @@
     ,   "send":             "git://github.com/darobin/send#multiple-index"
     ,   "nopt":             "2.1.1"
     ,   "request":          "2.21.0"
+    ,   "shortid":          "1.0.8"
     }
 ,   "devDependencies": {
         "mocha":        "1.10.0"
