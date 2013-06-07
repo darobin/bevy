@@ -85,23 +85,51 @@ if (command === "deploy") {
     else { // git is the default
         conf.repository.url || cliUtils.die("Missing 'url' information for git repository.");
     }
-    // get to see if the app exists
-    // if it does, send the update signal
-    // otherwise, PUT it
+    // get to see if the app exists and put it
     request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res) {
         if (err) return console.log(err);
 
         var notExists = res.statusCode === 404;
         reqConf.json = conf;
         request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
-            if (err) return console.log(body.error);
-            if (notExists) {
-              delete reqConf.method; // I'm starting to hate this library
-              delete reqConf.json;
-              request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+            if (err) return console.log(err);
+            if (body && body.error) return console.log(body.error);
+
+            delete reqConf.method; // I'm starting to hate this library
+            delete reqConf.json;
+
+            var whenDone = function () {
+                if (notExists) {
+                    request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+                }
+                else {
+                    console.log("OK");
+                }
+            };
+            
+            // a session for a long-running job was opened, poll
+            if (res.statusCode === 202) {
+                var url = conf.deploy + "session/" + body.id
+                ,   poll = function () {
+                        request.get(url, reqConf, function (err, res, body) {
+                            if (err) return console.log(err);
+                            body = (typeof body === "string") ? JSON.parse(body) : body;
+                            if (body && body.error) return console.log(body.error);
+                            if (body.done) return console.log("OK");
+                            for (var i = 0, n = body.messages.length; i < n; i++) {
+                                var msg = body.messages[i];
+                                if (msg[0] === "error") console.log("[ERROR]");
+                                console.log(msg[1]);
+                            }
+                            setTimeout(poll, 3000);
+                        });
+                    }
+                ;
+                poll();
             }
+            // this succeeded immediately
             else {
-              console.log("OK");
+                whenDone();
             }
         });
     });
