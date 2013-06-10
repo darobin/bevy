@@ -26,4 +26,7 @@
     ,   "expect.js":    "0.2.0"
     ,   "prompt":       "0.2.9"
     }
+,   "scripts": {
+        "test": "mocha"
+    }
 }

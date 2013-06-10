@@ -24,6 +24,7 @@ var expect = require("expect.js")
 before(function (done) {
     this.timeout(0);
     utile.rimraf(storePath, function (err) {
+        if (err) throw err;
         portfinder.getPort(function (err, port) {
             if (err) throw err;
             api += port + "/";
@@ -100,7 +101,7 @@ describe("Static server", function () {
         exec(bevyPath + " deploy --deploy " + api + " --path " + staticDir + " --domain " + testDomain, function (err, stdout, stderr) {
             if (stdout && debug) console.log("[STDOUT]", stdout);
             if (stderr && debug) console.log("[STDERR]", stderr);
-            setTimeout(done, 200); // wait a bit because it can take a little while to spawn
+            setTimeout(done, 500); // wait a bit because it can take a little while to spawn
         });
     });
     after(function (done) {
@@ -163,7 +164,7 @@ describe("Dynamic server", function () {
         exec(bevyPath + " deploy --deploy " + api + " --url " + appDir + " --domain " + testDomain, function (err, stdout, stderr) {
             if (stdout && debug) console.log("[STDOUT]", stdout);
             if (stderr && debug) console.log("[STDERR]", stderr);
-            setTimeout(done, 200); // wait a bit because it can take a little while to spawn
+            setTimeout(done, 500); // wait a bit because it can take a little while to spawn
         });
     });
     after(function (done) {
