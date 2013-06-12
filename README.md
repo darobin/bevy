@@ -306,6 +306,22 @@ If the app is not found, it returns a 404 with:
 For all other errors, it returns a 500 with the ```error``` field set to whatever error the
 system provided.
 
+The success response for this method can take two forms. If the app is a simple local application
+that does not require a possibly long-running operation (such as git cloning or npm install) then
+it will immediately reply with status ```200 OK``` and a ```{ "ok": true }``` as the body.
+
+If however the request involves a long running process, then it will reply with status
+```202 Accepted```. The response body will be JSON similar to the following:
+
+    {
+        "session":  true
+    ,   "id":       "PTBjY3J3tM"
+    ,   "path":     "/session/PTBjY3J3tM"
+    }
+
+The ```id``` (or the ```path```) can then be used with the session API described below in order to
+poll the server about its progress in carrying out the update.
+
 ### PUT /app/:name
 Create or update the configuration of an app. The body of the request must be the desired
 configuration (as described in the previous section).
@@ -329,7 +345,7 @@ If the ```repository``` or ```domain``` fields are missing, it returns a 400 wit
 For all other errors, it returns a 500 with the ```error``` field set to whatever error the
 system provided.
 
-Note that this can take a while to respond as npm installs dependencies.
+The response is the same as for the previous method.
 
 ### DELETE /app/:name
 Stops and deletes the app.
@@ -342,3 +358,34 @@ If it fails, it returns a 500 with one of:
 
     { error: "Failed to stop app, cannot remove: REASON" }
     { error: "Failed to remove app: REASON" }
+
+### GET /session/:id
+Query as specific session corresponding to a long-running backend process (npm, git). This is
+used by the client in order to poll ongoing progress. Several different responses can be received:
+
+If there is no such session, a 404 error. Note that when a session terminates, it will continue to
+respond with 200 until the Bevy server is restarted. This means that you should never get a 404 out
+of your polling, even when the session has terminated (unless the server has been restarted, which
+is unlikely).
+
+If there is such a session, the response is 200 with a body that depends on the status of the
+session.
+
+If the session is finished, you just receive ```{ done: true }```. If it is running, you will get
+```{ messages: [array, of, messages]}```.
+
+Each message is an array with a type as its first value and optionally a string as its second value.
+If the key is ```progress```, it is a progress message and the accompanying string will be a human
+description of the progress event. If the key is ```error```, it is an error message and the 
+accompanying string will be whatever error message could be gathered. Errors typically lead to the
+termination of the session. Finally, if the key is ```end```, there is no accompanying string and
+it indicates that this will be the last message of the session (it will soon be flagged as done if
+it hasn't already).
+
+Note that whenever you ask for a session, the messages that are returned to you are removed from the
+queue of messages that Bevy is maintaining. Therefore, you will never get the same message twice and
+can safely just display them when polling multiple times without being concerned that you may show
+a given message more than once.
+
+It is possible for the array of messages to be empty if nothing at all has happened since you last 
+polled.
