@@ -115,11 +115,12 @@ if (command === "deploy") {
                             if (err) return console.log(err);
                             body = (typeof body === "string") ? JSON.parse(body) : body;
                             if (body && body.error) return console.log(body.error);
-                            if (body.done) return console.log("OK");
+                            if (body.done) return whenDone();
                             for (var i = 0, n = body.messages.length; i < n; i++) {
                                 var msg = body.messages[i];
                                 if (msg[0] === "error") console.log("[ERROR]");
-                                console.log(msg[1]);
+                                if (msg[0] === "end") console.log("Session terminating.");
+                                else process.stdout.write(msg[1]);
                             }
                             setTimeout(poll, 3000);
                         });

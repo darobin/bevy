@@ -8,13 +8,14 @@ var expect = require("expect.js")
 ,   exec = require("child_process").exec
 ,   portfinder = require("portfinder")
 ,   request = require("request")
-,   prompt = require("prompt")
+// ,   prompt = require("prompt")
 ,   utile = require("utile")
 ,   serverPath = pth.join(__dirname, "../bin/bevy-server.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
 ,   storePath = pth.join(__dirname, "store")
 ,   version = require("../package.json").version
 ,   debug = false
+,   WAIT = 750
 ,   server
 ,   deployPort
 ,   testDomain
@@ -43,20 +44,22 @@ before(function (done) {
             server.stdout.on("data", function () {
                 if (seen) return;
                 seen = true;
-                if (process.env.BEVY_DOMAIN) {
-                    testDomain = process.env.BEVY_DOMAIN;
-                    done();
-                }
-                else {
-                    console.log("In order to test this, we need a domain pointing to this machine other than 'localhost'.");
-                    console.log("You can also set the BEVY_DOMAIN environment variable to avoid this prompt.");
-                    prompt.start();
-                    prompt.get(["domain"], function (err, res) {
-                        if (err) throw(err);
-                        testDomain = res.domain;
-                        done();
-                    });
-                }
+                testDomain = process.env.BEVY_DOMAIN || "127.0.0.1";
+                done();
+                // if (process.env.BEVY_DOMAIN) {
+                //     testDomain = process.env.BEVY_DOMAIN;
+                //     done();
+                // }
+                // else {
+                //     console.log("In order to test this, we need a domain pointing to this machine other than 'localhost'.");
+                //     console.log("You can also set the BEVY_DOMAIN environment variable to avoid this prompt.");
+                //     prompt.start();
+                //     prompt.get(["domain"], function (err, res) {
+                //         if (err) throw(err);
+                //         testDomain = res.domain;
+                //         done();
+                //     });
+                // }
             });
         });
     });
@@ -101,7 +104,7 @@ describe("Static server", function () {
         exec(bevyPath + " deploy --deploy " + api + " --path " + staticDir + " --domain " + testDomain, function (err, stdout, stderr) {
             if (stdout && debug) console.log("[STDOUT]", stdout);
             if (stderr && debug) console.log("[STDERR]", stderr);
-            setTimeout(done, 500); // wait a bit because it can take a little while to spawn
+            setTimeout(done, WAIT); // wait a bit because it can take a little while to spawn
         });
     });
     after(function (done) {
@@ -164,16 +167,27 @@ describe("Dynamic server", function () {
         exec(bevyPath + " deploy --deploy " + api + " --url " + appDir + " --domain " + testDomain, function (err, stdout, stderr) {
             if (stdout && debug) console.log("[STDOUT]", stdout);
             if (stderr && debug) console.log("[STDERR]", stderr);
-            setTimeout(done, 500); // wait a bit because it can take a little while to spawn
+            setTimeout(done, WAIT); // wait a bit because it can take a little while to spawn
         });
     });
     after(function (done) {
-        exec(bevyPath + " remove --deploy " + api, function (err, stdout, stderr) {
-            if (stdout && debug) console.log("[STDOUT]", stdout);
-            if (stderr && debug) console.log("[STDERR]", stderr);
-            process.chdir(oldDir);
-            done();
-        });
+        var runRemove = function () {
+            exec(bevyPath + " remove --deploy " + api, function (err, stdout, stderr) {
+                if (stdout && debug) console.log("[STDOUT]", stdout);
+                if (stderr && debug) console.log("[STDERR]", stderr);
+                process.chdir(oldDir);
+                done();
+            });
+        };
+        if (debug) {
+            request.get(api + "apps", { json: true }, function (err, res, body) {
+                console.log(JSON.stringify(body, null, 4));
+                runRemove();
+            });
+        }
+        else {
+            runRemove();
+        }
     });
     it("serves basic content", function (done) {
         request.get("http://" + testDomain + ":" + deployPort, function (err, res, body) {
