@@ -14,7 +14,7 @@ var expect = require("expect.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
 ,   storePath = pth.join(__dirname, "store")
 ,   version = require("../package.json").version
-,   debug = false
+,   debug = true
 ,   WAIT = 750
 ,   server
 ,   deployPort
