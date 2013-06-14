@@ -70,6 +70,12 @@ connections to its management API coming from the local machine, corresponding t
 value ```local```. This can be set to ```none``` to disable this check. **BE VERY CAREFUL** as this
 effectively enables anyone who can reach the server to install and run arbitrary software on the
 machine.
+* ```uid```, ```-u```, ```--uid```: The user id under which to run spawned processes. If you are
+running Bevy as root (which is required on many platforms in order to be able to listen on ports
+lower than 1024) then it is highly recommended to set this option to a user with lower privileges.
+Otherwise not only will the spawned services be running as root, but also git and npm, as well as
+whatever script npm runs.
+* ```gid```, ```-g```, ```--gid```: Same as the previous one, but for the group id.
 <!-- /bevy-server usage -->
 
 An example configuration file:
@@ -78,11 +84,14 @@ An example configuration file:
         "domain":   "deploy.example.net"
     ,   "ports":    [80, 443]
     ,   "store":    "/users/bevy/store/"
+    ,   "uid":      "www-data"
+    ,   "gid":      "www-data"
     }
 
 The same on the command line:
 
-    forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/
+    forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/ \
+                              -u www-data -g www-data
 
 You can mix and match the configuration file and command line parameters; the latter will take
 priority.
@@ -203,6 +212,11 @@ that command, run it at start up, etc.
 
 With the above setup, your deployment target simply becomes ```http://localhost:2000/```. When Bevy
 talks to that URL, it will be talking to the remote server.
+
+Another important security-related aspect to take into account are the uid/gid settings. As 
+explained in the configuration section, if these are unset and you are running as root (which is
+often required), then not only spawned services but also git and npm will run as root. Needless to
+say, this can be a large attack vector.
 
 REST API
 --------

@@ -12,6 +12,8 @@ var nopt = require("nopt")
     ,   ports:      [Array, Number]
     ,   store:      String
     ,   security:   String
+    ,   uid:        String
+    ,   gid:        String
     ,   help:       Boolean
     }
 ,   shortHands = {
@@ -19,6 +21,8 @@ var nopt = require("nopt")
     ,   d:      ["--domain"]
     ,   p:      ["--ports"]
     ,   s:      ["--store"]
+    ,   u:      ["--uid"]
+    ,   g:      ["--gid"]
     ,   h:      ["--help"]
     }
 ,   cli = nopt(knownOpts, shortHands, process.argv, 2)
