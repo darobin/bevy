@@ -74,8 +74,10 @@ machine.
 running Bevy as root (which is required on many platforms in order to be able to listen on ports
 lower than 1024) then it is highly recommended to set this option to a user with lower privileges.
 Otherwise not only will the spawned services be running as root, but also git and npm, as well as
-whatever script npm runs.
-* ```gid```, ```-g```, ```--gid```: Same as the previous one, but for the group id.
+whatever script npm runs. Note that due to limitations in Node's API this has to be the numeric
+uid (use ```id -u username``` to get it).
+* ```gid```, ```-g```, ```--gid```: Same as the previous one, but for the group id. Note that due to
+limitations in Node's API this has to be the numeric gid (use ```id -g username``` to get it).
 <!-- /bevy-server usage -->
 
 An example configuration file:
@@ -84,14 +86,14 @@ An example configuration file:
         "domain":   "deploy.example.net"
     ,   "ports":    [80, 443]
     ,   "store":    "/users/bevy/store/"
-    ,   "uid":      "www-data"
-    ,   "gid":      "www-data"
+    ,   "uid":      501
+    ,   "gid":      20
     }
 
 The same on the command line:
 
     forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/ \
-                              -u www-data -g www-data
+                              -u 501 -g 20
 
 You can mix and match the configuration file and command line parameters; the latter will take
 priority.

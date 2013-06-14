@@ -14,7 +14,7 @@ var expect = require("expect.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
 ,   storePath = pth.join(__dirname, "store")
 ,   version = require("../package.json").version
-,   debug = true
+,   debug = false
 ,   WAIT = 750
 ,   server
 ,   deployPort
@@ -30,10 +30,20 @@ before(function (done) {
             if (err) throw err;
             api += port + "/";
             deployPort = port;
-            server = spawn(serverPath, ["-d", "localhost"
-                                    ,   "-p", port
-                                    ,   "-s", storePath
-                                    ]);
+            var serverOpt = ["-d", "localhost"
+                        ,    "-p", port
+                        ,    "-s", storePath
+                        ];
+            if (process.getuid) {
+                serverOpt.push("-u");
+                serverOpt.push(process.getuid());
+            }
+            if (process.getgid) {
+                serverOpt.push("-g");
+                serverOpt.push(process.getgid());
+            }
+            if (debug) console.log("SERVER OPTIONS:", serverOpt.join(" "));
+            server = spawn(serverPath, serverOpt);
             if (debug) {
                 server.stdout.on("data", function (data) { console.log("[SERVER OUT]", data.toString()); });
                 server.stderr.on("data", function (data) { console.log("[SERVER OUT]", data.toString()); });
