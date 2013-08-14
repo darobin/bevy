@@ -15,7 +15,7 @@ proxy if you don't want to (Bevy comes with a built-in static file server so tha
 it for purely static content). This proxy also exposes a simple REST API that receives configuration
 commands that allows it to install, remove, start, stop, list, and describe the applications that
 Bevy is running for you. It knows how to fetch an app's content from either git or a local 
-directory, and it knows how to run npm in order to install dependencies.
+directory, and it knows how to run npm in order to install dependencies from your repository.
 
 So the idea is this: once you have bevy up and running on a machine (which is trivial and only
 requires minimal configuration), all you need to deploy your Node apps is a tiny bit of extra
@@ -124,8 +124,9 @@ It supports the following fields:
     * ```branch```: Applies to type ```git```, indicates which branch to use. Defaults to whatever the
 default branch in that repository is.
     * ```path```: Applies to type ```local```, gives the file system path to use. Note that when an
-app is both local and static, Bevy will not copy the files over but rather serve directly from that
-directory.
+app is both local, Bevy will not copy the files over but rather serve directly from that directory.
+This includes not running npm to install dependencies; if you're pointing at a local directory it is
+up to you to do so (the primary use for ```local``` is development, where this is what you expect).
 * ```scripts```: This is the standard ```package.json``` scripts object. Bevy uses its ```start```
 field to know which application to start. Defaults to ```app.js```.
 * ```directoryIndex```: Applies only to static servers, this provides a list of file names to use
