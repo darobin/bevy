@@ -8,7 +8,6 @@ var expect = require("expect.js")
 ,   exec = require("child_process").exec
 ,   portfinder = require("portfinder")
 ,   request = require("request")
-// ,   prompt = require("prompt")
 ,   utile = require("utile")
 ,   serverPath = pth.join(__dirname, "../bin/bevy-server.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
@@ -56,20 +55,6 @@ before(function (done) {
                 seen = true;
                 testDomain = process.env.BEVY_DOMAIN || "127.0.0.1";
                 done();
-                // if (process.env.BEVY_DOMAIN) {
-                //     testDomain = process.env.BEVY_DOMAIN;
-                //     done();
-                // }
-                // else {
-                //     console.log("In order to test this, we need a domain pointing to this machine other than 'localhost'.");
-                //     console.log("You can also set the BEVY_DOMAIN environment variable to avoid this prompt.");
-                //     prompt.start();
-                //     prompt.get(["domain"], function (err, res) {
-                //         if (err) throw(err);
-                //         testDomain = res.domain;
-                //         done();
-                //     });
-                // }
             });
         });
     });
