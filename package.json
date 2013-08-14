@@ -9,7 +9,7 @@
     }
 ,   "dependencies": {
         "http-proxy":       "git://github.com/darobin/node-http-proxy#wildcard-host-table"
-    ,   "forever-monitor":  "1.2.2"
+    ,   "forever-monitor":  "git://github.com/darobin/forever-monitor#logger-maxlisteners"
     ,   "utile":            "0.2.0"
     ,   "portfinder":       "0.2.1"
     ,   "express":          "3.2.4"
