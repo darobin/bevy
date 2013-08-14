@@ -35,6 +35,13 @@ to if you prefer to use something else). For that:
 
 And that's it.
 
+Examples
+--------
+
+I strongly recommend you get familiar with the entirety of this document before you deploy Bevy,
+but if you want to play with simple examples to get a feel for it you can simply look in the
+examples directory.
+
 Running the Bevy server
 -----------------------
 
