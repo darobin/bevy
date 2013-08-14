@@ -1,8 +1,5 @@
 
-# Running a site with Bevy
-
-For an example of running a Node app, look inside hello-app; for a static site look at static-site.
-The instructions below apply equally to both, and assume you're in one of those directories.
+# Running a static site with Bevy
 
 First, start a toy bevy-server instance from inside a clone of this repository on a free port (if
 you pick a different port, change the deploy field in bevy.json):
