@@ -1,0 +1,8 @@
+{
+    "domain": "127.0.0.1",
+    "deploy": "http://localhost:8042/",
+    "repository": {
+        "type": "local",
+        "path": "/@@@path/to@@@/bevy/examples/hello-app/"
+    }
+}
