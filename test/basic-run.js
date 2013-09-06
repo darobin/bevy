@@ -91,6 +91,23 @@ describe("Server basics", function () {
     });
 });
 
+function checkInApps (field, running, done) {
+    request.get(api + "apps", function (err, res, body) {
+        expect(err).to.be(null);
+        body = JSON.parse(body);
+        expect(body[field]).to.be.ok();
+        expect(body[field].running).to.equal(running);
+        done();
+    });
+}
+
+function actionThenCheck (url, field, running, done) {
+    request.get(url, function (err) {
+        expect(err).to.be(null);
+        checkInApps(field, running, done);
+    });
+}
+
 describe("Static server", function () {
     var oldDir = process.cwd();
     before(function (done) {
@@ -117,39 +134,9 @@ describe("Static server", function () {
             done();
         });
     });
-    it("shows up in list of apps", function (done) {
-        request.get(api + "apps", function (err, res, body) {
-            expect(err).to.be(null);
-            body = JSON.parse(body);
-            expect(body.static).to.be.ok();
-            expect(body.static.running).to.be.ok();
-            done();
-        });
-    });
-    it("stops", function (done) {
-        request.get(api + "app/static/stop", function (err) {
-            expect(err).to.be(null);
-            request.get(api + "apps", function (err, res, body) {
-                expect(err).to.be(null);
-                body = JSON.parse(body);
-                expect(body.static).to.be.ok();
-                expect(body.static.running).to.be(false);
-                done();
-            });
-        });
-    });
-    it("restarts", function (done) {
-        request.get(api + "app/static/start", function (err) {
-            expect(err).to.be(null);
-            request.get(api + "apps", function (err, res, body) {
-                expect(err).to.be(null);
-                body = JSON.parse(body);
-                expect(body.static).to.be.ok();
-                expect(body.static.running).to.ok();
-                done();
-            });
-        });
-    });
+    it("shows up in list of apps", function (done) { checkInApps("static", true, done); });
+    it("stops", function (done) { actionThenCheck(api + "app/static/stop", "static", false, done); });
+    it("restarts", function (done) { actionThenCheck(api + "app/static/start", "static", true, done); });
 });
 
 describe("Dynamic server", function () {
@@ -191,37 +178,38 @@ describe("Dynamic server", function () {
             done();
         });
     });
-    it("shows up in list of apps", function (done) {
-        request.get(api + "apps", function (err, res, body) {
-            expect(err).to.be(null);
-            body = JSON.parse(body);
-            expect(body.gitapp).to.be.ok();
-            expect(body.gitapp.running).to.be.ok();
+    it("shows up in list of apps", function (done) { checkInApps("gitapp", true, done); });
+    it("stops", function (done) { actionThenCheck(api + "app/gitapp/stop", "gitapp", false, done); });
+    it("restarts", function (done) { actionThenCheck(api + "app/gitapp/start", "gitapp", true, done); });
+});
+
+describe("Proxy to arbitrary service", function () {
+    before(function (done) {
+        exec(bevyPath + " deploy --deploy " + api + " --name proxy --to 173.194.34.131:80 --domain " + testDomain, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
+            setTimeout(done, WAIT); // wait a bit because it can take a little while to spawn
+        });
+    });
+    after(function (done) {
+        exec(bevyPath + " remove --name proxy --deploy " + api, function (err, stdout, stderr) {
+            if (stdout && debug) console.log("[STDOUT]", stdout);
+            if (stderr && debug) console.log("[STDERR]", stderr);
             done();
         });
     });
-    it("stops", function (done) {
-        request.get(api + "app/gitapp/stop", function (err) {
+    it("serves basic content", function (done) {
+        request.get("http://" + testDomain + ":" + deployPort, function (err, res, body) {
             expect(err).to.be(null);
-            request.get(api + "apps", function (err, res, body) {
-                expect(err).to.be(null);
-                body = JSON.parse(body);
-                expect(body.gitapp).to.be.ok();
-                expect(body.gitapp.running).to.be(false);
-                done();
-            });
+            expect(body).to.match(/Google/);
+            done();
         });
     });
-    it("restarts", function (done) {
-        request.get(api + "app/gitapp/start", function (err) {
-            expect(err).to.be(null);
-            request.get(api + "apps", function (err, res, body) {
-                expect(err).to.be(null);
-                body = JSON.parse(body);
-                expect(body.gitapp).to.be.ok();
-                expect(body.gitapp.running).to.ok();
-                done();
-            });
-        });
-    });
+
+    it("shows up in list of apps", function (done) { checkInApps("proxy", true, done); });
+    it("stops", function (done) { actionThenCheck(api + "app/proxy/stop", "proxy", false, done); });
+    it("restarts", function (done) { actionThenCheck(api + "app/proxy/start", "proxy", true, done); });
 });
+
+// XXX add deployment from the remote test repo as well
+// perhaps remove the dependency on express because it's slow

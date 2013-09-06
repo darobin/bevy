@@ -12,10 +12,12 @@ surmountable, of course, but it's all pretty repetitive too.
 The basic principle of Bevy is simple. It runs as a single proxy service for all of your Node
 applications, possibly directly on port 80 so that you don't even have to worry about a world-facing
 proxy if you don't want to (Bevy comes with a built-in static file server so that you can also use
-it for purely static content). This proxy also exposes a simple REST API that receives configuration
-commands that allow it to install, remove, start, stop, list, and describe the applications that
-Bevy is running for you. It knows how to fetch an app's content from either git or a local 
-directory, and it knows how to run npm in order to install dependencies from your repository.
+it for purely static content, as well as with the ability to proxy to arbitrary third-party services
+should you need that as an escape hatch). This proxy also exposes a simple REST API that receives
+configuration commands that allow it to install, remove, start, stop, list, and describe the
+applications that Bevy is running for you. It knows how to fetch an app's content from either git or
+a local directory, and it knows how to run npm in order to install dependencies from your
+repository.
 
 So the idea is this: once you have bevy up and running on a machine (which is trivial and only
 requires minimal configuration), all you need to deploy your Node apps is a tiny bit of extra
@@ -148,6 +150,9 @@ up to you to do so (the primary use for ```local``` is development, where this i
 field to know which application to start. Defaults to ```app.js```.
 * ```directoryIndex```: Applies only to static servers, this provides a list of file names to use
 to select the directory index. It defaults to ```index.html```.
+* ```to```: This option enables Bevy to simply act as a proxy to a remote service that it does not
+manage. The format is that of
+[proxima's endpoints](https://github.com/BlueJeansAndRain/proxima#configuration-endpoints).
 
 The way Bevy obtains that information is as follows:
 
@@ -193,6 +198,11 @@ The options, which must come after the action, are the following:
 * ```--branch```: Same as ```repository.branch``` in JSON.
 * ```--path```: Same as ```repository.path``` in JSON.
 * ```--start```: Same as ```scripts.start``` in JSON.
+* ```---to```: This has the same function as ```to``` in JSON, but with a different syntax (since in
+JSON it uses a structured object). If it's a number, that's the port. If it starts with "/", then
+it's a path. Otherwise it expects it to be a host:port pair (without any scheme, as in 
+127.0.0.1:8043).
+* ```--secure```: Same as ```to.secure``` in JSON.
 
 <!-- /bevy usage -->
 

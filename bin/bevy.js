@@ -20,6 +20,8 @@ var nopt = require("nopt")
     ,   branch:     String
     ,   path:       String
     ,   start:      String
+    ,   to:         String
+    ,   secure:     Boolean
     }
 ,   command = process.argv.splice(2, 1)[0]
 ,   cli = nopt(knownOpts, {}, process.argv, 2)
@@ -70,6 +72,20 @@ conf.name || cliUtils.die("Missing 'name' information.");
 if (conf.deploy.indexOf("://") === -1) conf.deploy = "http://" + conf.deploy;
 if (!/\/$/.test(conf.deploy)) conf.deploy += "/";
 
+// process proxy options
+if (cli.to) {
+    var opt = {};
+    if (/^\d+$/.test(cli.to)) opt.port = 1 * cli.to;
+    else if (/^\//.test(cli.to)) opt.path = cli.to;
+    else {
+        var spl = cli.to.split(":");
+        opt.host = spl[0];
+        opt.port = 1 * spl[1];
+    }
+    opt.secure = cli.secure;
+    conf.to = opt;
+}
+
 var reqConf = {};
 function simpleRes (err, res, body) {
     if (err) return console.log(err);
@@ -79,11 +95,13 @@ function simpleRes (err, res, body) {
 }
 
 if (command === "deploy") {
-    if (conf.repository.type === "local") {
-        conf.repository.path || cliUtils.die("Missing 'path' information for local repository.");
-    }
-    else { // git is the default
-        conf.repository.url || cliUtils.die("Missing 'url' information for git repository.");
+    if (!conf.to) {
+        if (conf.repository.type === "local") {
+            conf.repository.path || cliUtils.die("Missing 'path' information for local repository.");
+        }
+        else { // git is the default
+            conf.repository.url || cliUtils.die("Missing 'url' information for git repository.");
+        }
     }
     // get to see if the app exists and put it
     request.get(conf.deploy + "app/" + conf.name, reqConf, function (err, res) {
