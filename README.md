@@ -91,6 +91,7 @@ whatever script npm runs. Note that due to limitations in Node's API this has to
 uid (use ```id -u username``` to get it).
 * ```gid```, ```-g```, ```--gid```: Same as the previous one, but for the group id. Note that due to
 limitations in Node's API this has to be the numeric gid (use ```id -g username``` to get it).
+
 <!-- /bevy-server usage -->
 
 An example configuration file:
@@ -192,6 +193,7 @@ The options, which must come after the action, are the following:
 * ```--branch```: Same as ```repository.branch``` in JSON.
 * ```--path```: Same as ```repository.path``` in JSON.
 * ```--start```: Same as ```scripts.start``` in JSON.
+
 <!-- /bevy usage -->
 
 
