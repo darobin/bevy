@@ -13,13 +13,15 @@ The basic principle of Bevy is simple. It runs as a single proxy service for all
 applications, possibly directly on port 80 so that you don't even have to worry about a world-facing
 proxy if you don't want to (Bevy comes with a built-in static file server so that you can also use
 it for purely static content). This proxy also exposes a simple REST API that receives configuration
-commands that allows it to install, remove, start, stop, list, and describe the applications that
+commands that allow it to install, remove, start, stop, list, and describe the applications that
 Bevy is running for you. It knows how to fetch an app's content from either git or a local 
 directory, and it knows how to run npm in order to install dependencies from your repository.
 
 So the idea is this: once you have bevy up and running on a machine (which is trivial and only
 requires minimal configuration), all you need to deploy your Node apps is a tiny bit of extra
 configuration and a simple command line call.
+
+Bevy works with HTTP, HTTPS, and Web Sockets.
 
 Installing Bevy
 ---------------
@@ -67,7 +69,9 @@ to all incoming requests on its given ports, but one of those domains has to be 
 service that it exposes to manage the apps it is running. Defaults to localhost.
 * ```ports```, ```-p```, ```--ports```: The port on which to listen for requests to proxy. Note that
 several can be specified (using an array in JSON, and repeated options on the command line). It will
-listen to all of the provided ports and proxy in the same way for all. Defaults to 80.
+listen to all of the provided ports and proxy in the same way for all (except that secure ports only
+trigger on HTTPS and the rest only on HTTP). If you wish to listen to a secure port for HTTPS, then
+prefix it with "s". Defaults to [80].
 * ```store```, ```-s```, ```--store```: The directory in which Bevy will store the apps that it
 manages. Note that this needs to be writable by Bevy. Defaults to a directory called ```bevy-store```
 in either your ```$TMPDIR``` or ```/var/tmp```. It is **strongly** recommended to set this to 
@@ -91,7 +95,7 @@ An example configuration file:
 
     {
         "domain":   "deploy.example.net"
-    ,   "ports":    [80, 443]
+    ,   "ports":    [80, "s443"]
     ,   "store":    "/users/bevy/store/"
     ,   "uid":      501
     ,   "gid":      20
@@ -99,7 +103,7 @@ An example configuration file:
 
 The same on the command line:
 
-    forever start bevy-server -d deploy.example.net -p 80 -p 443 -s /users/bevy/store/ \
+    forever start bevy-server -d deploy.example.net -p 80 -p s443 -s /users/bevy/store/ \
                               -u 501 -g 20
 
 You can mix and match the configuration file and command line parameters; the latter will take
@@ -227,6 +231,22 @@ Another important security-related aspect to take into account are the uid/gid s
 explained in the configuration section, if these are unset and you are running as root (which is
 often required), then not only spawned services but also git and npm will run as root. Needless to
 say, this can be a large attack vector.
+
+Bevy and HTTPS
+--------------
+
+Bevy dispatches HTTPS connections based on SNI. The advantage here is that you do not need to muck
+with certs at the Bevy level and only set that up in your application — proxying will just work. The
+downside is that SNI is not supported in some old clients (XP, IE less than 7, Android browser less
+than 3). For those, either provide an HTTP endpoint, or send in a pull request to support HTTPS
+more directly.
+
+Bevy and Web Sockets
+--------------------
+
+Bevy uses [proxima](https://github.com/BlueJeansAndRain/proxima/) under the hood and so mirrors its
+support for Web Sockets. Essentially, since the negotiation phase in the WS protocol is HTTP-based,
+Bevy simply proxies based on that and afterwards the connection should be transparently relayed.
 
 REST API
 --------
