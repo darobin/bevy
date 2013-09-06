@@ -8,7 +8,7 @@
     ,   "bevy":         "./bin/bevy.js"
     }
 ,   "dependencies": {
-        "http-proxy":       "git://github.com/darobin/node-http-proxy#wildcard-host-table"
+        "proxima":          "0.4.6"
     ,   "forever-monitor":  "git://github.com/darobin/forever-monitor#logger-maxlisteners"
     ,   "utile":            "0.2.0"
     ,   "portfinder":       "0.2.1"
