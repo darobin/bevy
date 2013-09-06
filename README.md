@@ -64,9 +64,11 @@ applicable) are as follows:
 <!-- bevy-server usage -->
 * ```-h```, ```--help```: Show this usage.
 * ```-f path```, ```--config path```: The path to a configuration file to use, possibly relative.
-* ```domain```, ```-d```, ```--domain```: The domain to use for the deployment service. Bevy listens
-to all incoming requests on its given ports, but one of those domains has to be assigned to the
-service that it exposes to manage the apps it is running. Defaults to localhost.
+* ```domain```, ```-d```, ```--domain```: The domain to use for the deployment service (i.e. the
+REST API which Bevy exposes, not for the services being proxied to — those are set up by the
+client). Bevy listens to all incoming requests on its given ports, but one of those domains has to
+be assigned to the service that it exposes to manage the apps it is running. Defaults to
+localhost.
 * ```ports```, ```-p```, ```--ports```: The port on which to listen for requests to proxy. Note that
 several can be specified (using an array in JSON, and repeated options on the command line). It will
 listen to all of the provided ports and proxy in the same way for all (except that secure ports only
@@ -122,7 +124,10 @@ It takes the following fields into account:
 * ```deploy```: The URL (including scheme and port) of the Bevy server to deploy to. Required.
 * ```name```: This is the standard ```package.json``` name field; Bevy uses this to provide your
 app with a unique ID on the server. Required.
-* ```domain```: The domain (just the host) at which you wish to have your app reachable.
+* ```domain```: The domain (just the host) at which you wish to have your app reachable. If the
+domain begins and ends with "/" it is interpreted as a regular expression; otherwise it's a glob. In
+globs, the * character matches any number of characters with no restrictions, and the ? character
+matches everything except separators (. or :).
 * ```dependencies```: This is the standard ```package.json``` dependencies field; Bevy uses this to
 tell npm what to install. Defaults to none.
 * ```static```: A boolean that when true indicates that this project is actually static so that no
