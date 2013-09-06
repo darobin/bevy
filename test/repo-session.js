@@ -67,9 +67,8 @@ describe("Repository basics", function () {
             expect(seenEnd).to.be.ok();
             expect(session.messages()).to.be.ok();
             expect(session.messages().length).to.equal(0);
-            // we have the right git content
-            // we have the npm dependencies
-            // app.repository.branch is used
+            expect(fs.existsSync(pth.join(repoPath, "content/good.js"))).to.be.ok();
+            expect(fs.existsSync(pth.join(repoPath, "content/node_modules/web-schema"))).to.be.ok();
             done();
         });
         session.on("progress", function () {
@@ -78,7 +77,7 @@ describe("Repository basics", function () {
         session.on("end", function () {
             seenEnd = true;
         });
-        expect(session.id).to.match(/^\w+$/);
+        expect(session.id).to.match(/^[-_\w]+$/);
         expect(session.done).to.not.be.ok();
         expect(session.queue.length).to.equal(0);
     });
