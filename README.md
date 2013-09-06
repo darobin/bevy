@@ -275,7 +275,7 @@ lost here, except perhaps RESTafarian brownie points. I can live without those.
 
 All interactions involve JSON.
 
-### GET /
+### GET /version
 Provides the server information. Mostly useful to check that it's running.
 Always returns the version:
 

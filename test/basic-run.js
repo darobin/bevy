@@ -54,7 +54,7 @@ before(function (done) {
                 if (seen) return;
                 seen = true;
                 testDomain = process.env.BEVY_DOMAIN || "127.0.0.1";
-                done();
+                setTimeout(done, WAIT);
             });
         });
     });
@@ -72,7 +72,7 @@ describe("Server basics", function () {
     });
     
     it("starts a basic server", function (done) {
-        request.get(api,function (err, res, body) {
+        request.get(api + "version", function (err, res, body) {
             body = JSON.parse(body);
             expect(body.bevy).to.equal(version);
             done();
