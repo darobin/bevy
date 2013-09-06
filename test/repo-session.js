@@ -1,8 +1,9 @@
+/*jshint es5: true*/
 /*global before, after, describe*/
 
 var expect = require("expect.js")
 ,   pth = require("path")
-// ,   fs = require("fs")
+,   fs = require("fs")
 ,   repo = require("../lib/repo")
 ,   utile = require("utile")
 ,   repoPath = pth.join(__dirname, "repo")
@@ -28,7 +29,15 @@ function cleanup (done) {
     });
 }
 
-before(cleanup);
+before(function (done) {
+    cleanup(function (err) {
+        if (err) throw err;
+        fs.mkdir(repoPath, function (err) {
+            if (err) throw err;
+            done();
+        });
+    });
+});
 after(cleanup);
 
 describe("Repository basics", function () {
@@ -38,12 +47,39 @@ describe("Repository basics", function () {
             done();
         });
     });
+    it("Clones a repository with the right session behaviour", function (done) {
+        this.timeout(10000);
+        var app = {
+            repository: {
+                type:   "git"
+            ,   url:    "https://github.com/darobin/bevy-test-repo.git"
+            ,   branch: "repo-test"
+            }
+        ,   contentPath:    pth.join(repoPath, "content")
+        ,   storePath:      repoPath
+        };
+        var seenProgress = false
+        ,   seenEnd = false
+        ;
+        var session = repo.update(app, {}, function (err) {
+            expect(err).to.not.be.ok();
+            expect(seenProgress).to.be.ok();
+            expect(seenEnd).to.be.ok();
+            expect(session.messages()).to.be.ok();
+            expect(session.messages().length).to.equal(0);
+            // we have the right git content
+            // we have the npm dependencies
+            // app.repository.branch is used
+            done();
+        });
+        session.on("progress", function () {
+            seenProgress = true;
+        });
+        session.on("end", function () {
+            seenEnd = true;
+        });
+        expect(session.id).to.match(/^\w+$/);
+        expect(session.done).to.not.be.ok();
+        expect(session.queue.length).to.equal(0);
+    });
 });
-
-// returned session has id, done is false, empty queue
-// session gets progress events
-// session gets end event
-// session messages returns something
-// we have the right git content
-// we have the npm dependencies
-// app.repository.branch is used

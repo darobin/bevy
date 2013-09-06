@@ -11,3 +11,4 @@ install-and-restart.sh
 send
 forever-monitor
 ssl
+bevy-test-repo
