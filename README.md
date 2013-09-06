@@ -283,7 +283,7 @@ Example response:
       "first-test": {
         "name": "first-test",
         "version": "0.0.1",
-        "domain": "first-test.local",
+        "domain": "*.first-test.local",
         "dependencies": {
           "express": "*",
           "eyes": "*"
