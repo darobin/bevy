@@ -178,6 +178,7 @@ starts it.
 * ```stop```: Stops the app.
 * ```remove```: Removes the app. Note that this can be somewhat destructive, it will remove logs
 (as well as anything that your app may have stored under its running directory).
+* ```update```: Causes the app to update itself from the repo and install new dependencies if any.
 * ```stage```: Deploys the app using the configuration for the "development" environment but setting
 the runtime environment to "production". This allows you to run code on your development deployment
 under production conditions.
@@ -268,11 +269,8 @@ Bevy simply proxies based on that and afterwards the connection should be transp
 REST API
 --------
 
-The REST API exposed to manage applications would be better described as an HTTP API because it's
-not in fact all that RESTful. Where it made sense, I elected to go with simplicity of interaction
-(e.g. just entering a URL in the browser bar) over "correctness". I don't believe that anything is
-lost here, except perhaps RESTafarian brownie points. I can live without those.
-
+A simple HTTP API is exposed to talk to Bevy. All that it is able to do can be controlled in this
+way, and in fact the command line client and the browser UI both rely on it exclusively. 
 All interactions involve JSON.
 
 ### GET /version
@@ -327,7 +325,7 @@ If the app is not found, it returns a 404 with:
 
 If successful, it will return the same JSON as above, below the corresponding app name key.
 
-### GET /app/:name/start
+### POST /app/:name/start
 Starts the app.
 
 If the app is not found, it returns a 404 with:
@@ -341,7 +339,7 @@ If the app was already running, it returns a 418 with:
 For all other errors, it returns a 500 with the ```error``` field set to whatever error the
 system provided.
 
-### GET /app/:name/stop
+### POST /app/:name/stop
 Stops the app
 
 If the app is not found, it returns a 404 with:
@@ -355,7 +353,7 @@ If the app was already running, it returns a 418 with:
 For all other errors, it returns a 500 with the ```error``` field set to whatever error the
 system provided.
 
-### GET /app/:name/update
+### POST /app/:name/update
 Causes the source of the app to update from the repo (pull it through git, or copying files), and
 the app to then be restarted. This can be quite long, especially if npm installs a number of new
 dependencies.

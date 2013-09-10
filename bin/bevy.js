@@ -45,7 +45,7 @@ if (command === "stage") {
 
 
 // go to help immediately if requested
-if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|stage|help [OPTIONS]", "bevy");
+if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|update|stage|help [OPTIONS]", "bevy");
 
 // load the config and override it with CLI parameters
 var packConf = {}, bevyConf = {};
@@ -94,6 +94,27 @@ function simpleRes (err, res, body) {
     console.log("OK");
 }
 
+function pollSession (id, reqConf, done) {
+    var url = conf.deploy + "session/" + id
+    ,   poll = function () {
+            request.get(url, reqConf, function (err, res, body) {
+                if (err) return console.log(err);
+                body = (typeof body === "string") ? JSON.parse(body) : body;
+                if (body && body.error) return console.log(body.error);
+                if (body.done) return done();
+                for (var i = 0, n = body.messages.length; i < n; i++) {
+                    var msg = body.messages[i];
+                    if (msg[0] === "error") console.log("[ERROR]");
+                    if (msg[0] === "end") console.log("Session terminating.");
+                    else process.stdout.write(msg[1]);
+                }
+                setTimeout(poll, 3000);
+            });
+        }
+    ;
+    poll();
+}
+
 if (command === "deploy") {
     if (!conf.to) {
         if (conf.repository.type === "local") {
@@ -118,7 +139,7 @@ if (command === "deploy") {
 
             var whenDone = function () {
                 if (notExists) {
-                    request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+                    request.post(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
                 }
                 else {
                     console.log("OK");
@@ -127,24 +148,7 @@ if (command === "deploy") {
             
             // a session for a long-running job was opened, poll
             if (res.statusCode === 202) {
-                var url = conf.deploy + "session/" + body.id
-                ,   poll = function () {
-                        request.get(url, reqConf, function (err, res, body) {
-                            if (err) return console.log(err);
-                            body = (typeof body === "string") ? JSON.parse(body) : body;
-                            if (body && body.error) return console.log(body.error);
-                            if (body.done) return whenDone();
-                            for (var i = 0, n = body.messages.length; i < n; i++) {
-                                var msg = body.messages[i];
-                                if (msg[0] === "error") console.log("[ERROR]");
-                                if (msg[0] === "end") console.log("Session terminating.");
-                                else process.stdout.write(msg[1]);
-                            }
-                            setTimeout(poll, 3000);
-                        });
-                    }
-                ;
-                poll();
+                pollSession(body.id, reqConf, whenDone);
             }
             // this succeeded immediately
             else {
@@ -154,10 +158,19 @@ if (command === "deploy") {
     });
 }
 else if (command === "start") {
-    request.get(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
+    request.post(conf.deploy + "app/" + conf.name + "/start", reqConf, simpleRes);
 }
 else if (command === "stop") {
-    request.get(conf.deploy + "app/" + conf.name + "/stop", reqConf, simpleRes);
+    request.post(conf.deploy + "app/" + conf.name + "/stop", reqConf, simpleRes);
+}
+else if (command === "update") {
+    request.post(conf.deploy + "app/" + conf.name + "/update", reqConf, function (err, res, body) {
+        if (err) return console.log(err);
+        if (body && body.error) return console.log(body.error);
+        var done = function () { console.log("OK"); }
+        if (res.statusCode === 202) pollSession(body.id, reqConf, done);
+        else done();
+    });
 }
 else if (command === "remove") {
     request.del(conf.deploy + "app/" + conf.name, reqConf, simpleRes);

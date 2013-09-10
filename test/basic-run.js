@@ -102,7 +102,7 @@ function checkInApps (field, running, done) {
 }
 
 function actionThenCheck (url, field, running, done) {
-    request.get(url, function (err) {
+    request.post(url, function (err) {
         expect(err).to.be(null);
         checkInApps(field, running, done);
     });
