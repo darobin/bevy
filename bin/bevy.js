@@ -104,7 +104,7 @@ function pollSession (id, reqConf, done) {
                 if (body.done) return done();
                 for (var i = 0, n = body.messages.length; i < n; i++) {
                     var msg = body.messages[i];
-                    if (msg[0] === "error") console.log("[ERROR]");
+                    if (msg[0] === "error") console.log("[ERROR]" + msg[1]);
                     if (msg[0] === "end") console.log("Session terminating.");
                     else process.stdout.write(msg[1]);
                 }

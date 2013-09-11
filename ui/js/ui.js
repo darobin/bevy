@@ -12,6 +12,7 @@
     });
 
     // append a service to the list
+    // XXX if there is "to" it's a proxy, we're not handling that
     function appendService (serv) {
         var $tmpl = $tmp.html(tmplService).children().first().clone();
         $tmpl.find("h4").text(serv.name + " (" + serv.domain + ")").end()
@@ -53,8 +54,29 @@
     });
     
     function progress (title) {
+        var $body = $("#info-body")
+        ,   $title = $("#info-title")
+        ;
+        $title.text(title);
+        $body.text("Operation in progress\u2026");
+        $("#info").modal();
+        var $pre;
+        return {
+            log:    function (msg) {
+                if (!$pre) {
+                    $body.html("<pre></pre>");
+                    $pre = $body.find("pre");
+                }
+                $pre.append(document.createTextNode(msg));
+            }
+        ,   title:  function (tit) {
+                $title.text(tit);
+            }
+        };
+    }
+    function success (title, message) {
         $("#info-title").text(title);
-        $("#info-body").text("Operation in progress\u2026");
+        $("#info-body").text(message);
         $("#info").modal();
     }
     function error (title, message) {
@@ -80,6 +102,7 @@
         var name = getName($(this));
         alert("Edit not supported on " + name);
     });
+    // START
     $services.on("click", "[data-action=start]", function () {
         var $el = $(this)
         ,   name = getName($el)
@@ -102,6 +125,7 @@
             }
         }, "json");
     });
+    // STOP
     $services.on("click", "[data-action=stop]", function () {
         var $el = $(this)
         ,   name = getName($el)
@@ -124,9 +148,47 @@
             }
         }, "json");
     });
+    // UPDATE
     $services.on("click", "[data-action=update]", function () {
-        var name = getName($(this));
-        alert("Update not supported on " + name);
+        var $el = $(this)
+        ,   name = getName($el)
+        ;
+        $el.attr("disabled", "disabled");
+        var prog = progress("Updating service");
+        $.post("/app/" + name + "/update", function (data, status, xhr) {
+            console.log(data, status, xhr);
+            $el.removeAttr("disabled");
+            if (data.error) {
+                error("Failed to update service", data.error);
+            }
+            else {
+                if (xhr.status === 200) {
+                    success("Update successful", "The application has been immediately updated.");
+                }
+                else if (xhr.status === 202) {
+                    var url = "/session/" + data.id
+                    ,   poll = $.getJSON(url, function (data) {
+                            if (data.error) return error("Session error in update", data.error);
+                            if (data.done) {
+                                prog.title("Update done");
+                                prog.log("\nDONE.");
+                                return;
+                            }
+                            for (var i = 0, n = data.messages.length; i < n; i++) {
+                                var msg = data.messages[i];
+                                if (msg[0] === "error") prog.log("\n[ERROR] " + msg[1]);
+                                if (msg[0] === "end") prog.log("\nSession terminating.");
+                                else prog.log(msg[1]);
+                            }
+                            setTimeout(poll, 1000);
+                        });
+                    poll();
+                }
+                else {
+                    error("Update issue", "Unknown update response code: "+ xhr.status);
+                }
+            }
+        }, "json");
     });
 }(jQuery));
 
