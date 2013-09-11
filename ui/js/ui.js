@@ -1,3 +1,4 @@
+/*jshint es5: true*/
 
 (function ($) {
     var $services = $("#services")
@@ -13,22 +14,22 @@
     // append a service to the list
     function appendService (serv) {
         var $tmpl = $tmp.html(tmplService).children().first().clone();
-        $tmpl.find("h4")
-                .text(serv.name + " (" + serv.domain + ")")
-             .end()
+        $tmpl.find("h4").text(serv.name + " (" + serv.domain + ")").end()
+             .find(".env").text(serv.env).end()
+             .find(".mode").text(serv.static ? "static" : "dynamic").end()
+             .find(".path").text(serv.repository.path).end()
+             .find(".url").text(serv.repository.url).end()
+             .find(".branch").text(serv.repository.branch || "master").end()
+             .find(serv.repository.type === "git" ? ".local" : ".git").remove().end()
+             .find(".store").text(serv.storePath).end()
              .attr({ "data-name": serv.name })
              .addClass(serv.running ? "panel-info" : "panel-warning")
              .addClass(serv.running ? "running" : "not-running")
              .appendTo($services)
         ;
-        // XXX
-        // env
-        // static
-        // repository
-        //      local + path
-        //      git + url + branch
-        //  storePath
-        
+        if (serv.static && serv.repository.type === "local") {
+            $tmpl.find("[data-action=update]").attr("disabled", "disabled");
+        }
     }
     
     // (re)load list of services
