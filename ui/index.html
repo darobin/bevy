@@ -12,6 +12,9 @@
       .running [data-action=start], .not-running [data-action=stop] {
           display:  none;
       }
+      .service .table th {
+          padding: 5px 15px;
+      }
     </style>
   </head>
   <body>
@@ -59,32 +62,30 @@
     <script type='text/x-template' id='tmpl-service'>
       <div class='service panel'>
         <div class='panel-heading'><h4 class='panel-title'></h4></div>
-        <div class='panel-body row'>
-          <div class='col-md-8'>
-            <table class='table table-condensed'>
-              <tr>
-                <th>env</th>
-                <td class='env'></td>
-              </tr>
-              <tr>
-                <th>mode</th>
-                <td class='mode'></td>
-              </tr>
-              <tr class='local'>
-                <th>local</th>
-                <td class='path'></td>
-              </tr>
-              <tr class='git'>
-                <th>git</th>
-                <td><span class='url'></span> (branch: <span class='branch'></span>)</td>
-              </tr>
-              <tr>
-                <th>store</th>
-                <td class='store'></td>
-              </tr>
-            </table>
-          </div>
-          <div class='col-md-4'>
+        <table class='table table-condensed'>
+          <tr>
+            <th>env</th>
+            <td class='env'></td>
+          </tr>
+          <tr>
+            <th>mode</th>
+            <td class='mode'></td>
+          </tr>
+          <tr class='local'>
+            <th>local</th>
+            <td class='path'></td>
+          </tr>
+          <tr class='git'>
+            <th>git</th>
+            <td><span class='url'></span> (branch: <span class='branch'></span>)</td>
+          </tr>
+          <tr>
+            <th>store</th>
+            <td class='store'></td>
+          </tr>
+        </table>
+        <div class='panel-footer clearfix'>
+          <div class='pull-right'>
             <button type="button" class="btn btn-danger btn-xs" data-action='delete'>
               <b class='glyphicon glyphicon-trash'></b> Delete
             </button>
