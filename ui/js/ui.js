@@ -51,8 +51,25 @@
         alert("Add not supported");
     });
     
+    function progress (title) {
+        $("#info-title").text(title);
+        $("#info-body").text("Operation in progress\u2026");
+        $("#info").modal();
+    }
+    function error (title, message) {
+        $("#info-title").text(title);
+        $("#info-body").text(message);
+        $("#info").modal();
+    }
+    function hideInfo () {
+        $("#info").modal("hide");
+    }
+    
+    function getParent ($el) {
+        return $el.parents(".service");
+    }
     function getName ($el) {
-        return $el.parents(".service").attr("data-name");
+        return getParent($el).attr("data-name");
     }
     $services.on("click", "[data-action=delete]", function () {
         var name = getName($(this));
@@ -63,12 +80,48 @@
         alert("Edit not supported on " + name);
     });
     $services.on("click", "[data-action=start]", function () {
-        var name = getName($(this));
-        alert("Start not supported on " + name);
+        var $el = $(this)
+        ,   name = getName($el)
+        ,   $parent = getParent($el)
+        ;
+        $parent.removeClass("panel-warning");
+        $el.attr("disabled", "disabled");
+        progress("Starting service");
+        $.post("/app/" + name + "/start", function (data) {
+            $el.removeAttr("disabled");
+            if (data.error) {
+                error("Failed to start service", data.error);
+                $parent.addClass("panel-warning");
+            }
+            else {
+                $parent.addClass("panel-info");
+                $parent.removeClass("not-running");
+                $parent.addClass("running");
+                hideInfo();
+            }
+        }, "json");
     });
     $services.on("click", "[data-action=stop]", function () {
-        var name = getName($(this));
-        alert("Stop not supported on " + name);
+        var $el = $(this)
+        ,   name = getName($el)
+        ,   $parent = getParent($el)
+        ;
+        $parent.removeClass("panel-info");
+        $el.attr("disabled", "disabled");
+        progress("Stopping service");
+        $.post("/app/" + name + "/stop", function (data) {
+            $el.removeAttr("disabled");
+            if (data.error) {
+                error("Failed to stop service", data.error);
+                $parent.addClass("panel-info");
+            }
+            else {
+                $parent.addClass("panel-warning");
+                $parent.removeClass("running");
+                $parent.addClass("not-running");
+                hideInfo();
+            }
+        }, "json");
     });
     $services.on("click", "[data-action=update]", function () {
         var name = getName($(this));
