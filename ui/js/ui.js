@@ -84,9 +84,9 @@
         $("#info-body").text(message);
         $("#info").modal();
     }
-    function hideInfo () {
-        $("#info").modal("hide");
-    }
+    // function hideInfo () {
+    //     $("#info").modal("hide");
+    // }
     
     function getParent ($el) {
         return $el.parents(".service");
@@ -110,7 +110,6 @@
         ;
         $parent.removeClass("panel-warning");
         $el.attr("disabled", "disabled");
-        progress("Starting service");
         $.post("/app/" + name + "/start", function (data) {
             $el.removeAttr("disabled");
             if (data.error) {
@@ -121,7 +120,6 @@
                 $parent.addClass("panel-info");
                 $parent.removeClass("not-running");
                 $parent.addClass("running");
-                hideInfo();
             }
         }, "json");
     });
@@ -133,7 +131,6 @@
         ;
         $parent.removeClass("panel-info");
         $el.attr("disabled", "disabled");
-        progress("Stopping service");
         $.post("/app/" + name + "/stop", function (data) {
             $el.removeAttr("disabled");
             if (data.error) {
@@ -144,7 +141,6 @@
                 $parent.addClass("panel-warning");
                 $parent.removeClass("running");
                 $parent.addClass("not-running");
-                hideInfo();
             }
         }, "json");
     });
