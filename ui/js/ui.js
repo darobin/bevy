@@ -26,9 +26,10 @@
              .attr({ "data-name": serv.name })
              .addClass(serv.running ? "panel-info" : "panel-warning")
              .addClass(serv.running ? "running" : "not-running")
+             .data("bevy", serv)
              .appendTo($services)
         ;
-        if (serv.static && serv.repository.type === "local") {
+        if (serv.repository.type === "local") {
             $tmpl.find("[data-action=update]").attr("disabled", "disabled");
         }
     }
@@ -50,7 +51,7 @@
     
     // add a service
     $("#add").click(function () {
-        alert("Add not supported");
+        edit();
     });
     
     function progress (title) {
@@ -87,6 +88,20 @@
     // function hideInfo () {
     //     $("#info").modal("hide");
     // }
+    function edit ($el) {
+        var data = $el ? $el.data("bevy") : {};
+        $("#edit-title").text(data ? "Edit Service" : "Add Service");
+        $("#edit").modal();
+        $("#edit-body").load("/ui/app-form.html", function () {
+            // XXX
+            // populate it (when loaded)
+            // on save just PUT (check what's needed to update an existing service)
+            // if there's an element, its status changes while updating (maintain running or not status)
+            // and after success it gets updated
+            // otherwise just grab where it goes in the list, insert there, and scroll to it
+        });
+        // alert("Edit not supported.");
+    }
     
     function getParent ($el) {
         return $el.parents(".service");
@@ -94,13 +109,14 @@
     function getName ($el) {
         return getParent($el).attr("data-name");
     }
+    // XXX
     $services.on("click", "[data-action=delete]", function () {
         var name = getName($(this));
         alert("Delete not supported on " + name);
     });
+    // EDIT
     $services.on("click", "[data-action=edit]", function () {
-        var name = getName($(this));
-        alert("Edit not supported on " + name);
+        edit(getParent($(this)));
     });
     // START
     $services.on("click", "[data-action=start]", function () {

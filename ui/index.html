@@ -43,7 +43,7 @@
     </div>
 
     <div class="modal fade" id="info" tabindex="-1"
-         role="dialog" aria-labelledby="progress-title" aria-hidden="true">
+         role="dialog" aria-labelledby="info-title" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
@@ -54,6 +54,24 @@
           <div class="modal-body" id='info-body'></div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="edit" tabindex="-1"
+         role="dialog" aria-labelledby="edit-title" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close"
+                    data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h4 class="modal-title" id='edit-title'></h4>
+          </div>
+          <div class="modal-body" id='edit-body'></div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" id="edit-save">Save</button>
           </div>
         </div>
       </div>

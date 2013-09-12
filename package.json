@@ -19,6 +19,8 @@
     ,   "nopt":             "2.1.1"
     ,   "request":          "2.21.0"
     ,   "shortid":          "1.0.8"
+    ,   "web-schema-forms": "0.0.2"
+    ,   "web-schema-forms-bootstrap": "0.0.3"
     }
 ,   "devDependencies": {
         "mocha":        "1.10.0"
