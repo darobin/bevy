@@ -12,7 +12,7 @@
     ,   "forever-monitor":  "git://github.com/darobin/forever-monitor#logger-maxlisteners"
     ,   "utile":            "0.2.0"
     ,   "portfinder":       "0.2.1"
-    ,   "express":          "3.2.4"
+    ,   "express":          "3.4.0"
     ,   "touch":            "0.0.2"
     ,   "deep-equal":       "0.0.0"
     ,   "send":             "git://github.com/darobin/send#multiple-index"
