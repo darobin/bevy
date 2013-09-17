@@ -1,3 +1,80 @@
 {
-    
+    "type":         "object"
+,   "description":  "Bevy Service"
+,   "properties":   {
+        "name":     {
+            "type":         "string"
+        ,   "description":  "Name"
+        ,   "pattern":      "^[\\.\\w-]+$"
+        ,   "required":     true
+        }
+    ,   "domain":   {
+            "type":         "string"
+        ,   "description":  "Domain"
+        ,   "pattern":      "^[\\.\\w-]+$"
+        ,   "required":     true
+        }
+    ,   "deploy":   {
+            "type":         "url"
+        ,   "description":  "Deploy to"
+        }
+    ,   "static":   {
+            "type":         "boolean"
+        ,   "description":  "Static site"
+        }
+    ,   "repository":   {
+            "description":  "Repository"
+        ,   "type":     [
+                 {
+                     "type":         "object"
+                 ,   "description":  "Local"
+                 ,   "properties":   {
+                         "type":     {
+                             "type":         "string"
+                         ,   "description":  "Type"
+                         ,   "enum":         ["local"]
+                         ,   "required":     true
+                         }
+                     ,   "path":     {
+                             "type":         "string"
+                         ,   "description":  "Path"
+                         ,   "required":     true
+                         }
+                     }
+                 }
+             ,   {
+                     "type":         "object"
+                 ,   "description":  "Git"
+                 ,   "properties":   {
+                         "type":     {
+                             "type":         "string"
+                         ,   "description":  "Type"
+                         ,   "enum":         ["git"]
+                         ,   "required":     true
+                         }
+                     ,   "url":     {
+                             "type":         "string"
+                         ,   "description":  "URL"
+                         ,   "required":     true
+                         }
+                     ,   "branch":     {
+                             "type":         "string"
+                         ,   "description":  "Branch"
+                         ,   "pattern":  "^[\\.\\w-]+$"
+                         }
+                     }
+                 }
+             ]
+        }
+    ,   "env":   {
+            "type":         "string"
+        ,   "description":  "Environment"
+        ,   "enum":         ["development", "production"]
+        ,   "required":     true
+        }
+    ,   "running":   {
+            "type":         "boolean"
+        ,   "description":  "Running"
+        }
+    }
 }

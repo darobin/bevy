@@ -1,0 +1,71 @@
+
+<form class="form-horizontal">
+  <div class="form-group">
+    <label for="name" class="col-lg-3 control-label">Name</label>
+    <div class="col-lg-9">
+      <input type="text" class="form-control" id="name" pattern="^[\.\w-]$" required>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="domain" class="col-lg-3 control-label">Domain</label>
+    <div class="col-lg-9">
+      <input type="text" class="form-control" id="domain" pattern="^[\.\w-]$" required>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="deploy" class="col-lg-3 control-label">Deploy to</label>
+    <div class="col-lg-9">
+      <input type="url" class="form-control" id="deploy">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="static" class="col-lg-3 control-label">Static site</label>
+    <div class="col-lg-9">
+      <input type="checkbox" id="static">
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="repository" class="col-lg-3 control-label">Repository</label>
+    <div class="col-lg-9 web-schema-type-switch">
+      <fieldset>
+        <legend>
+          <input type="radio" name="repository" id='repository' checked> Local
+        </legend>
+        <input type="hidden" name="repository.type" value="local">
+        <div class="form-group">
+          <label for="repository.path" class="col-lg-3 control-label">Path</label>
+          <div class="col-lg-9">
+            <input type="text" class="form-control" id="repository.path" required>
+          </div>
+        </div>
+      </fieldset>
+      <fieldset disabled>
+        <legend>
+          <input type="radio" name="repository"> Git
+        </legend>
+        <input type="hidden" name="repository.type" value="git">
+        <div class="form-group">
+          <label for="repository.url" class="col-lg-3 control-label">URL</label>
+          <div class="col-lg-9">
+            <input type="text" class="form-control" id="repository.url" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="repository.branch" class="col-lg-3 control-label">Branch</label>
+          <div class="col-lg-9">
+            <input type="text" class="form-control" id="repository.branc" pattern="^[\.\w-]+$">
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="env" class="col-lg-3 control-label">Environment</label>
+    <div class="col-lg-9">
+      <select id='env' class="form-control">
+        <option>development</option>
+        <option>production</option>
+      </select>
+    </div>
+  </div>
+</form>

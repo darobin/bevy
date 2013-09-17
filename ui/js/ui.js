@@ -92,7 +92,24 @@
         var data = $el ? $el.data("bevy") : {};
         $("#edit-title").text(data ? "Edit Service" : "Add Service");
         $("#edit").modal();
-        $("#edit-body").load("/ui/app-form.html", function () {
+        $("#edit-body").load("/app-form.html", function () {
+            // here we add support for functionality that eventually Web Schema Forms will add
+            $(".web-schema-type-switch > fieldset > legend > input[type=radio]").change(function () {
+                console.log("change!");
+                console.log($(this).parent().text());
+                $(this).parents(".web-schema-type-switch")
+                       .first()
+                       .find("> fieldset > legend > input[type=radio]")
+                            .each(function () {
+                                var $el = $(this);
+                                $el.parents("fieldset")
+                                   .first()
+                                   .prop("disabled", !$el.prop("checked"))
+                                   ;
+                            });
+            });
+            // not sure why Bootstrap does this, killing it
+            $("#edit-save").prop("disabled", false);
             // XXX
             // populate it (when loaded)
             // on save just PUT (check what's needed to update an existing service)
@@ -102,6 +119,7 @@
         });
         // alert("Edit not supported.");
     }
+    edit();
     
     function getParent ($el) {
         return $el.parents(".service");

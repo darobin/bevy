@@ -21,6 +21,11 @@ var expect = require("expect.js")
 ,   api = "http://localhost:"
 ;
 
+// XXX
+// it may be required to use 0.0.0.0 instead of 127.0.0.1 for testing on Travis
+// try to figure that out
+// it works locally too for cases in which it is needed
+
 before(function (done) {
     this.timeout(0);
     utile.rimraf(storePath, function (err) {
