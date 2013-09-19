@@ -29,7 +29,7 @@
     <div class="col-lg-9 web-schema-type-switch">
       <fieldset>
         <legend>
-          <input type="radio" name="repository" id='repository' checked> Local
+          <input type="radio" name="repository" id='repository' checked data-ignore='true'> Local
         </legend>
         <input type="hidden" name="repository.type" value="local">
         <div class="form-group">
@@ -41,7 +41,7 @@
       </fieldset>
       <fieldset disabled>
         <legend>
-          <input type="radio" name="repository"> Git
+          <input type="radio" name="repository" data-ignore='true'> Git
         </legend>
         <input type="hidden" name="repository.type" value="git">
         <div class="form-group">
@@ -53,7 +53,7 @@
         <div class="form-group">
           <label for="repository.branch" class="col-lg-3 control-label">Branch</label>
           <div class="col-lg-9">
-            <input type="text" class="form-control" id="repository.branc" pattern="^[\.\w-]+$">
+            <input type="text" class="form-control" id="repository.branch" pattern="^[\.\w-]+$">
           </div>
         </div>
       </fieldset>

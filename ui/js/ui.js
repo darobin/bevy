@@ -91,12 +91,11 @@
     function edit ($el) {
         var data = $el ? $el.data("bevy") : {};
         $("#edit-title").text(data ? "Edit Service" : "Add Service");
+        $("#edit-save").prop("disabled", false);
         $("#edit").modal();
         $("#edit-body").load("/app-form.html", function () {
             // here we add support for functionality that eventually Web Schema Forms will add
             $(".web-schema-type-switch > fieldset > legend > input[type=radio]").change(function () {
-                console.log("change!");
-                console.log($(this).parent().text());
                 $(this).parents(".web-schema-type-switch")
                        .first()
                        .find("> fieldset > legend > input[type=radio]")
@@ -109,17 +108,96 @@
                             });
             });
             // not sure why Bootstrap does this, killing it
-            $("#edit-save").prop("disabled", false);
+            // $("#edit-save").prop("disabled", false);
             // XXX
             // populate it (when loaded)
-            // on save just PUT (check what's needed to update an existing service)
-            // if there's an element, its status changes while updating (maintain running or not status)
-            // and after success it gets updated
-            // otherwise just grab where it goes in the list, insert there, and scroll to it
         });
-        // alert("Edit not supported.");
     }
-    edit();
+    
+    function save (data) {
+        $("#edit-save").prop("disabled", true);
+        $("#edit").modal("hide");
+        // XXX
+        //  if there is an element, switch its status (remove running/not-running + panel-info/panel-warning)
+        $.ajax("/app/" + data.name, {
+            data:   data
+        ,   type:   "PUT"
+        ,   success: function (data) {
+                if (data.error) return error(data.error);
+                // XXX
+                // (re)generate the markup
+                // if there's an element, replace it
+                // otherwise insert at the proper location
+                // scroll to the element
+            }
+        ,   error:  function () {
+                // XXX
+                //  re-show the dialog
+                //  get better information out of the error
+                error("Unknown error while saving");
+            }
+        });
+    }
+    
+    function isArray (obj) {
+        return Object.prototype.toString.call(obj) === "[object Array]";
+    }
+
+    function makeContainer (data, nextKey) {
+        if (data) return data;
+        if (typeof nextKey === "number") return [];
+        return {};
+    }
+
+    function setPath (data, key, value) {
+        var path = isArray(key) ? key : key.split(".")
+        ,   nextKey = path.shift()
+        ;
+        if (/^\d+$/.test(nextKey)) nextKey = 1 * nextKey;
+        var data = makeContainer(data, nextKey);
+        if (path.length) {
+            data[nextKey] = setPath(data[nextKey], path, value);
+        }
+        else {
+            data[nextKey] = value;
+        }
+        return data;
+    }
+    
+    function form2json ($form) {
+        var data;
+        $form.find("input, select, textarea")
+             .each(function () {
+                 var $control = $(this);
+                 if ($control.prop("disabled") ||
+                     $control.parents(":disabled").length ||
+                     $control.attr("data-ignore") === "true") return;
+                 var key = $control.attr("name") || $control.attr("id");
+                 if (!key) return;
+                 var value;
+                 if ($control.is("[type=checkbox]")) {
+                     if ($control.prop("checked") && $control.attr("value")) value = $control.attr("value");
+                     else value = $control.prop("checked");
+                 }
+                 else if ($control.is("[type=radio]")) {
+                     value = $control.prop("checked");
+                 }
+                 else {
+                     value = $control.val();
+                 }
+                 data = setPath(data, key, value);
+             });
+        return data;
+    }
+    function editDone () {
+        var $form = $("#edit form")
+        ,   json = form2json($form);
+        // XXX need to check validity
+        console.log(json);
+        save(json);
+    }
+    $("#edit-save").click(editDone);
+    $("#edit form").submit(editDone);
     
     function getParent ($el) {
         return $el.parents(".service");
