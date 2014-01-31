@@ -1,6 +1,7 @@
 /*jshint es5: true*/
 /*global before, after, describe*/
 
+
 var expect = require("expect.js")
 ,   pth = require("path")
 ,   fs = require("fs")
@@ -13,7 +14,7 @@ var expect = require("expect.js")
 ,   bevyPath = pth.join(__dirname, "../bin/bevy.js")
 ,   storePath = pth.join(__dirname, "store")
 ,   version = require("../package.json").version
-,   debug = false
+,   debug = true
 ,   WAIT = 750
 ,   server
 ,   deployPort
