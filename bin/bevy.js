@@ -44,8 +44,12 @@ if (command === "stage") {
 }
 
 
-// go to help immediately if requested
+// go to help immediately if requested, same for version
 if (command === "help") cliUtils.usage("bevy deploy|start|stop|remove|update|stage|help [OPTIONS]", "bevy");
+if (command === "version") {
+    console.log(require("../package.json").version);
+    process.exit(0);
+}
 
 // load the config and override it with CLI parameters
 var packConf = {}, bevyConf = {};
