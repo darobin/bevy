@@ -31,6 +31,12 @@ var nopt = require("nopt")
 ;
 delete cli.argv;
 
+// XXX
+// This is a horrible hack, but we need this to avoid zombies for now
+process.on("uncaughtException", function (err) {
+    console.error("Uncaught exception", err);
+});
+
 // go to help immediately if requested
 if (cli.help) cliUtils.usage("bevy-server [OPTIONS]", "bevy-server");
 
