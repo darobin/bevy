@@ -94,7 +94,7 @@ var reqConf = {};
 function simpleRes (err, res, body) {
     if (err) return console.log(err);
     body = (typeof body === "string") ? JSON.parse(body) : body;
-    if (body && body.error) return console.log(body.error);
+    if (body && body.error) return console.log("[ERROR]", body.error);
     console.log("OK");
 }
 
@@ -104,7 +104,7 @@ function pollSession (id, reqConf, done) {
             request.get(url, reqConf, function (err, res, body) {
                 if (err) return console.log(err);
                 body = (typeof body === "string") ? JSON.parse(body) : body;
-                if (body && body.error) return console.log(body.error);
+                if (body && body.error) return console.log("[ERROR]", body.error);
                 if (body.done) return done();
                 for (var i = 0, n = body.messages.length; i < n; i++) {
                     var msg = body.messages[i];
@@ -136,7 +136,7 @@ if (command === "deploy") {
         reqConf.json = conf;
         request.put(conf.deploy + "app/" + conf.name, reqConf, function (err, res, body) {
             if (err) return console.log(err);
-            if (body && body.error) return console.log(body.error);
+            if (body && body.error) return console.log("[ERROR]", body.error);
 
             delete reqConf.method; // I'm starting to hate this library
             delete reqConf.json;
@@ -171,7 +171,7 @@ else if (command === "update") {
     request.post(conf.deploy + "app/" + conf.name + "/update", reqConf, function (err, res, body) {
         if (err) return console.log(err);
         if (body && body.error) return console.log(body.error);
-        var done = function () { console.log("OK"); }
+        var done = function () { console.log("OK"); };
         if (res.statusCode === 202) pollSession(body.id, reqConf, done);
         else done();
     });
